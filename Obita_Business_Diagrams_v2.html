@@ -592,76 +592,6 @@ section.panel {
 .faint { color: var(--text-4); font-size: 11px; font-weight: 400; }
 .note-inline { font-size: 11px; color: var(--text-3); margin-left: 6px; font-weight: 400; }
 
-/* ============================================================
-   9. AUTH GATE
-============================================================ */
-#authOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(21,101,192,0.12), rgba(245,127,23,0.1));
-  backdrop-filter: blur(3px);
-  padding: 16px;
-}
-.auth-card {
-  width: 100%;
-  max-width: 380px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow-md);
-  padding: 22px;
-}
-.auth-card h2 {
-  font-size: 18px;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.auth-sub {
-  font-size: 12px;
-  color: var(--text-3);
-  margin-bottom: 16px;
-}
-.auth-form {
-  display: grid;
-  gap: 10px;
-}
-.auth-form label {
-  font-size: 12px;
-  color: var(--text-2);
-}
-.auth-form input {
-  width: 100%;
-  height: 38px;
-  padding: 0 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--panel-2);
-  color: var(--text);
-  outline: none;
-}
-.auth-form input:focus {
-  border-color: var(--tcsp-border);
-}
-.auth-submit {
-  margin-top: 4px;
-  height: 38px;
-  border-radius: 8px;
-  background: var(--tcsp);
-  color: #fff;
-  font-weight: 600;
-}
-.auth-error {
-  min-height: 18px;
-  font-size: 12px;
-  color: #C62828;
-}
-body.auth-locked .page { display: none; }
-body.auth-unlocked #authOverlay { display: none; }
-
 @media (max-width: 640px) {
   .page { padding: 20px 12px 60px; }
   section.panel { padding: 20px 16px; }
@@ -671,26 +601,7 @@ body.auth-unlocked #authOverlay { display: none; }
 }
 </style>
 </head>
-<body class="auth-locked">
-<div id="authOverlay" role="dialog" aria-modal="true" aria-label="登录">
-  <div class="auth-card">
-    <h2>登录后查看页面</h2>
-    <div class="auth-sub">请输入用户名和密码继续</div>
-    <form id="authForm" class="auth-form" autocomplete="off">
-      <div>
-        <label for="authUser">用户名</label>
-        <input id="authUser" type="text" name="username" required>
-      </div>
-      <div>
-        <label for="authPass">密码</label>
-        <input id="authPass" type="password" name="password" required>
-      </div>
-      <button type="submit" class="auth-submit">登录</button>
-      <div id="authError" class="auth-error" aria-live="polite"></div>
-    </form>
-  </div>
-</div>
-
+<body>
 <div class="page">
 
   <div class="topbar">
@@ -947,8 +858,8 @@ const PRESETS = [
   { n: 'MXN → USDT collection', svc: 'collection', src: 'MXN',  tgt: 'USDT', tag: '单主体 TCSP unbook (Velafi)' },
   { n: 'USDT → EUR payout',     svc: 'payout',     src: 'USDT', tgt: 'EUR',  tag: '跨主体 separable FX (Navro)' },
   { n: 'USD → BRL payout',      svc: 'payout',     src: 'USD',  tgt: 'BRL',  tag: 'USD hub 对照组' },
-  { n: 'SEK → USD collection',  svc: 'collection', src: 'SEK',  tgt: 'USD',  tag: 'MSO Navro local collection' },
-  { n: 'SEK → USDT collection', svc: 'collection', src: 'SEK',  tgt: 'USDT', tag: '跨主体 Navro Collection → Stable' }
+  { n: 'THB → USD collection',  svc: 'collection', src: 'THB',  tgt: 'USD',  tag: 'MSO Ksher bundled collection' },
+  { n: 'THB → USDT collection', svc: 'collection', src: 'THB',  tgt: 'USDT', tag: '跨主体 Ksher bundled → Stable' }
 ];
 
 /* ============================================================
@@ -1100,7 +1011,8 @@ function collectPaths(s, t, P) {
       tg: ['体外', '单主体 TCSP', 'bundled'],
       steps: [
         M('collection_conversion_unbook', 'TCSP', t+'/'+s, 'Velafi', 'live'),
-        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
       ]
     });
     if (has(CATS.YCARD, s)) P.push({
@@ -1108,7 +1020,8 @@ function collectPaths(s, t, P) {
       tg: ['体外', '单主体 TCSP', 'bundled'],
       steps: [
         M('collection_conversion_unbook', 'TCSP', t+'/'+s, 'Yellowcard', 'live'),
-        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
       ]
     });
     if (has(CATS.NL14, s)) P.push({
@@ -1155,14 +1068,16 @@ function collectPaths(s, t, P) {
       tg: ['体内', '单主体 MSO', '可分离'],
       steps: [
         M('fiat_collection', 'MSO', s, 'Navro', 'plan'),
-        M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan')
+        M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan')
       ]
     });
     if (has(CATS.KSHER, s)) P.push({
       n: 'MSO Ksher Collection (bundled) → USD',
       tg: ['体内', '单主体 MSO', 'bundled'],
       steps: [
-        M('collection_conversion_book', 'MSO', 'USD/'+s, 'Ksher', 'plan')
+        M('collection_conversion_book', 'MSO', 'USD/'+s, 'Ksher', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan')
       ]
     });
     if (has(CATS.VELAFI, s)) P.push({
@@ -1689,46 +1604,6 @@ function initTheme() {
 }
 
 /* ============================================================
-   AUTH
-============================================================ */
-function unlockPage() {
-  document.body.classList.remove('auth-locked');
-  document.body.classList.add('auth-unlocked');
-  try { sessionStorage.setItem('obita-auth-ok', '1'); } catch (e) {}
-}
-
-function initAuthGate() {
-  let alreadyOk = false;
-  try { alreadyOk = sessionStorage.getItem('obita-auth-ok') === '1'; } catch (e) {}
-  if (alreadyOk) {
-    unlockPage();
-    return true;
-  }
-
-  const form = document.getElementById('authForm');
-  const userInput = document.getElementById('authUser');
-  const passInput = document.getElementById('authPass');
-  const errorEl = document.getElementById('authError');
-  if (!form || !userInput || !passInput || !errorEl) return false;
-
-  userInput.focus();
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const ok = userInput.value.trim() === 'tony' && passInput.value === 'tototony';
-    if (!ok) {
-      errorEl.textContent = '用户名或密码错误';
-      passInput.value = '';
-      passInput.focus();
-      return;
-    }
-    errorEl.textContent = '';
-    unlockPage();
-    init();
-  });
-  return false;
-}
-
-/* ============================================================
    INIT
 ============================================================ */
 function init() {
@@ -1747,15 +1622,10 @@ function init() {
   renderPathsForQuery();
 }
 
-function boot() {
-  const canEnter = initAuthGate();
-  if (canEnter) init();
-}
-
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot);
+  document.addEventListener('DOMContentLoaded', init);
 } else {
-  boot();
+  init();
 }
 </script>
 </body>
