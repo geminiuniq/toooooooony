@@ -615,24 +615,10 @@ section.panel {
   box-shadow: var(--shadow-md);
   padding: 22px;
 }
-.auth-card h2 {
-  font-size: 18px;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-.auth-sub {
-  font-size: 12px;
-  color: var(--text-3);
-  margin-bottom: 16px;
-}
-.auth-form {
-  display: grid;
-  gap: 10px;
-}
-.auth-form label {
-  font-size: 12px;
-  color: var(--text-2);
-}
+.auth-card h2 { font-size: 18px; color: var(--text); margin-bottom: 6px; }
+.auth-sub { font-size: 12px; color: var(--text-3); margin-bottom: 16px; }
+.auth-form { display: grid; gap: 10px; }
+.auth-form label { font-size: 12px; color: var(--text-2); }
 .auth-form input {
   width: 100%;
   height: 38px;
@@ -643,9 +629,7 @@ section.panel {
   color: var(--text);
   outline: none;
 }
-.auth-form input:focus {
-  border-color: var(--tcsp-border);
-}
+.auth-form input:focus { border-color: var(--tcsp-border); }
 .auth-submit {
   margin-top: 4px;
   height: 38px;
@@ -654,11 +638,7 @@ section.panel {
   color: #fff;
   font-weight: 600;
 }
-.auth-error {
-  min-height: 18px;
-  font-size: 12px;
-  color: #C62828;
-}
+.auth-error { min-height: 18px; font-size: 12px; color: #C62828; }
 body.auth-locked .page { display: none; }
 body.auth-unlocked #authOverlay { display: none; }
 
@@ -947,8 +927,8 @@ const PRESETS = [
   { n: 'MXN → USDT collection', svc: 'collection', src: 'MXN',  tgt: 'USDT', tag: '单主体 TCSP unbook (Velafi)' },
   { n: 'USDT → EUR payout',     svc: 'payout',     src: 'USDT', tgt: 'EUR',  tag: '跨主体 separable FX (Navro)' },
   { n: 'USD → BRL payout',      svc: 'payout',     src: 'USD',  tgt: 'BRL',  tag: 'USD hub 对照组' },
-  { n: 'SEK → USD collection',  svc: 'collection', src: 'SEK',  tgt: 'USD',  tag: 'MSO Navro local collection' },
-  { n: 'SEK → USDT collection', svc: 'collection', src: 'SEK',  tgt: 'USDT', tag: '跨主体 Navro Collection → Stable' }
+  { n: 'THB → USD collection',  svc: 'collection', src: 'THB',  tgt: 'USD',  tag: 'MSO Ksher bundled collection' },
+  { n: 'THB → USDT collection', svc: 'collection', src: 'THB',  tgt: 'USDT', tag: '跨主体 Ksher bundled → Stable' }
 ];
 
 /* ============================================================
@@ -1100,7 +1080,8 @@ function collectPaths(s, t, P) {
       tg: ['体外', '单主体 TCSP', 'bundled'],
       steps: [
         M('collection_conversion_unbook', 'TCSP', t+'/'+s, 'Velafi', 'live'),
-        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
       ]
     });
     if (has(CATS.YCARD, s)) P.push({
@@ -1108,7 +1089,8 @@ function collectPaths(s, t, P) {
       tg: ['体外', '单主体 TCSP', 'bundled'],
       steps: [
         M('collection_conversion_unbook', 'TCSP', t+'/'+s, 'Yellowcard', 'live'),
-        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
       ]
     });
     if (has(CATS.NL14, s)) P.push({
@@ -1155,14 +1137,16 @@ function collectPaths(s, t, P) {
       tg: ['体内', '单主体 MSO', '可分离'],
       steps: [
         M('fiat_collection', 'MSO', s, 'Navro', 'plan'),
-        M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan')
+        M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan')
       ]
     });
     if (has(CATS.KSHER, s)) P.push({
       n: 'MSO Ksher Collection (bundled) → USD',
       tg: ['体内', '单主体 MSO', 'bundled'],
       steps: [
-        M('collection_conversion_book', 'MSO', 'USD/'+s, 'Ksher', 'plan')
+        M('collection_conversion_book', 'MSO', 'USD/'+s, 'Ksher', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan')
       ]
     });
     if (has(CATS.VELAFI, s)) P.push({

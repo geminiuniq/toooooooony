@@ -3,946 +3,1744 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Obita 产品进展看板</title>
+<title>Obita 业务梳理 · Interactive</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #FAFAF7;
-    --bg-card: #FFFFFF;
-    --text-primary: #2C2C2A;
-    --text-secondary: #5F5E5A;
-    --text-tertiary: #888780;
-    --border: rgba(0,0,0,0.08);
+/* ============================================================
+   1. RESET + BASE
+============================================================ */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; cursor: pointer; border: 0; background: transparent; color: inherit; }
+select { font: inherit; }
 
-    --teal-50: #E1F5EE;
-    --teal-600: #0F6E56;
-    --teal-800: #085041;
-    --teal-900: #04342C;
+/* ============================================================
+   2. THEME VARIABLES
+============================================================ */
+:root {
+  --bg: #F5F6F8;
+  --panel: #FFFFFF;
+  --panel-2: #F8F9FA;
+  --panel-3: #EEF0F3;
+  --border: #E2E5EA;
+  --border-strong: #C9CED6;
+  --text: #1A1A1A;
+  --text-2: #555;
+  --text-3: #888;
+  --text-4: #B0B5BC;
 
-    --amber-50: #FAEEDA;
-    --amber-200: #EF9F27;
-    --amber-800: #633806;
-    --amber-900: #412402;
+  /* Entity accents */
+  --tcsp: #1565C0;
+  --tcsp-bg: #E3F2FD;
+  --tcsp-border: #1E88E5;
+  --mso: #7B1FA2;
+  --mso-bg: #F3E5F5;
+  --mso-border: #9C27B0;
 
-    --blue-50: #E6F1FB;
-    --blue-400: #378ADD;
-    --blue-800: #0C447C;
-    --blue-900: #042C53;
+  /* Boundary accents */
+  --book: #2E7D32;        /* 体内 / 内部LP */
+  --book-bg: #E8F5E9;
+  --book-border: #4CAF50;
+  --unbook: #E65100;       /* 体外 */
+  --unbook-bg: #FFF3E0;
+  --unbook-border: #FB8C00;
 
-    --purple-50: #EEEDFE;
-    --purple-400: #7F77DD;
-    --purple-800: #3C3489;
-    --purple-900: #26215C;
+  /* Channel amber */
+  --channel: #F57F17;
+  --channel-bg: #FFF8E1;
+  --channel-border: #FFB300;
 
-    --pink-50: #FBEAF0;
-    --pink-900: #4B1528;
+  /* Status */
+  --live: #2E7D32; --live-bg: #E8F5E9;
+  --wip: #E65100;  --wip-bg: #FFF3E0;
+  --plan: #888;    --plan-bg: #F0F0F0;
+  --tbd: #F57F17;  --tbd-bg: #FFF8E1;
 
-    --gray-100: #D3D1C7;
-  }
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 14px;
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1A1A18;
-      --bg-card: #242422;
-      --text-primary: #E8E6DC;
-      --text-secondary: #B4B2A9;
-      --text-tertiary: #888780;
-      --border: rgba(255,255,255,0.08);
-    }
-  }
+  /* Section 1 palette — swapped: 体内 pale, 体外 saturated */
+  --s1-client-bg: #EDF1F7;
+  --s1-client-bd: #C5CFDC;
+  --s1-bvi-bg:    #DDEDDD;
+  --s1-bvi-bd:    #9BC39E;
+  --s1-bvi-fg:    #2E5E34;
+  --s1-chan-in-bg: #FBEBB0;
+  --s1-chan-in-bd: #D4B85C;
+  --s1-chan-in-fg: #6B5522;
+  --s1-chan-out-bg: #B08F2E;
+  --s1-chan-out-bd: #8A6F22;
+  --s1-chan-out-fg: #FFFFFF;
+  --s1-lp-out-bg:  #4A9E5C;
+  --s1-lp-out-bd:  #3D8A4C;
+  --s1-lp-out-fg:  #FFFFFF;
+}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: var(--bg);
-    color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
+[data-theme="dark"] {
+  --bg: #0F1419;
+  --panel: #1A1F2A;
+  --panel-2: #232936;
+  --panel-3: #2B323F;
+  --border: #2E3543;
+  --border-strong: #3E475A;
+  --text: #E8EAED;
+  --text-2: #B8BDC6;
+  --text-3: #8A909B;
+  --text-4: #5E6572;
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
-  .header { margin-bottom: 24px; }
-  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
-  .header .meta { font-size: 13px; color: var(--text-tertiary); }
+  --s1-client-bg: rgba(140,175,230,0.12);
+  --s1-client-bd: rgba(140,175,230,0.30);
+  --s1-bvi-bg:    rgba(129,199,132,0.22);
+  --s1-bvi-bd:    rgba(129,199,132,0.55);
+  --s1-bvi-fg:    #A5D6A7;
+  --s1-chan-in-bg: rgba(255,193,7,0.15);
+  --s1-chan-in-bd: rgba(255,193,7,0.45);
+  --s1-chan-in-fg: #FFD54F;
+  --s1-chan-out-bg: #B58A2B;
+  --s1-chan-out-bd: #946F1E;
+  --s1-chan-out-fg: #FFFFFF;
+  --s1-lp-out-bg:  #4A9E5C;
+  --s1-lp-out-bd:  #5FB06C;
+  --s1-lp-out-fg:  #FFFFFF;
 
-  .legend {
-    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-    margin-bottom: 28px; padding: 12px 16px;
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
-  }
-  .legend-pill { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; white-space: nowrap; }
-  .legend-desc { font-size: 12px; color: var(--text-secondary); margin-left: auto; }
+  --tcsp: #64B5F6;
+  --tcsp-bg: rgba(33,150,243,0.14);
+  --tcsp-border: #1E88E5;
+  --mso: #CE93D8;
+  --mso-bg: rgba(156,39,176,0.18);
+  --mso-border: #9C27B0;
 
-  .status-live { background: #9FE1CB; color: #04342C; }
-  .status-dev { background: #FAC775; color: #412402; }
-  .status-integrating { background: #85B7EB; color: #042C53; }
-  .status-pending { background: #AFA9EC; color: #26215C; }
+  --book: #81C784;
+  --book-bg: rgba(76,175,80,0.15);
+  --book-border: #4CAF50;
+  --unbook: #FFB74D;
+  --unbook-bg: rgba(251,140,0,0.15);
+  --unbook-border: #FB8C00;
 
-  .section-header {
-    padding: 10px 16px; border-radius: 8px; margin: 28px 0 16px;
-    font-size: 15px; font-weight: 600;
-  }
-  .section-header.sec-1 { background: var(--purple-50); color: var(--purple-900); }
-  .section-header.sec-2 { background: var(--pink-50); color: var(--pink-900); }
-  .section-header.sec-3 { background: var(--blue-50); color: var(--blue-900); }
+  --channel: #FFD54F;
+  --channel-bg: rgba(255,179,0,0.15);
+  --channel-border: #FFB300;
 
-  @media (prefers-color-scheme: dark) {
-    .section-header.sec-1 { background: rgba(127, 119, 221, 0.2); color: #CECBF6; }
-    .section-header.sec-2 { background: rgba(212, 83, 126, 0.2); color: #F4C0D1; }
-    .section-header.sec-3 { background: rgba(55, 138, 221, 0.2); color: #B5D4F4; }
-  }
+  --live: #81C784; --live-bg: rgba(76,175,80,0.18);
+  --wip: #FFB74D;  --wip-bg: rgba(251,140,0,0.18);
+  --plan: #8A909B; --plan-bg: rgba(138,144,155,0.18);
+  --tbd: #FFD54F;  --tbd-bg: rgba(255,213,79,0.18);
 
-  .card {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
-    padding: 20px 24px; margin-bottom: 14px;
-  }
-  .card-header {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
-  }
-  .card-title { font-size: 15px; font-weight: 600; }
-  .card-badge { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+}
 
-  .pipeline-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .pipeline-steps {
-    display: flex; flex: 1; min-width: 280px; align-items: center; position: relative;
-  }
-  .pipeline-steps::before {
-    content: ''; position: absolute; left: 8px; right: 8px; top: 8px;
-    height: 2px; background: var(--gray-100); z-index: 0;
-  }
-  .pipeline-step {
-    position: relative; z-index: 1; flex: 1;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-  }
-  .step-dot {
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--gray-100); border: 2px solid var(--bg-card);
-  }
-  .step-dot.done { background: var(--teal-600); }
-  .step-dot.active { background: var(--amber-200); }
-  .step-dot.integrating { background: var(--blue-400); }
-  .step-dot.waiting { background: var(--purple-400); }
-  .step-label { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; }
+/* ============================================================
+   3. LAYOUT
+============================================================ */
+.page { max-width: 1240px; margin: 0 auto; padding: 28px 20px 80px; }
 
-  .pitch { margin-top: 12px; padding: 12px 14px; border-radius: 8px; font-size: 13px; }
-  .pitch.teal { background: var(--teal-50); color: var(--teal-900); }
-  .pitch.amber { background: var(--amber-50); color: var(--amber-900); }
-  .pitch.blue { background: var(--blue-50); color: var(--blue-900); }
-  @media (prefers-color-scheme: dark) {
-    .pitch.teal { background: rgba(29, 158, 117, 0.15); color: #9FE1CB; }
-    .pitch.amber { background: rgba(239, 159, 39, 0.15); color: #FAC775; }
-    .pitch.blue { background: rgba(55, 138, 221, 0.15); color: #B5D4F4; }
-  }
-  .pitch .pitch-label { font-weight: 600; margin-right: 6px; }
-  .pitch-line { margin-top: 4px; }
-  .pitch-line:first-child { margin-top: 0; }
+.topbar {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 16px;
+}
+.topbar h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.topbar .subtitle { font-size: 13px; color: var(--text-3); margin-top: 4px; }
+.top-tools { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.icon-btn {
+  width: 34px; height: 34px; border-radius: 8px; background: var(--panel);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; transition: border-color .15s, background .15s;
+}
+.icon-btn:hover { border-color: var(--border-strong); }
 
-  .sub-line {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;
-  }
-  .sub-line-name {
-    font-size: 13px; font-weight: 500; color: var(--text-primary); min-width: 160px;
-  }
-  .sub-line .pipeline-steps { min-width: 240px; }
+.toc {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 18px; margin-bottom: 28px;
+  box-shadow: var(--shadow-sm);
+}
+.toc-row { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
+.toc-label { font-size: 12px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.6px; }
+.toc a { color: var(--tcsp); text-decoration: none; font-size: 13px; padding: 4px 10px; border-radius: 6px; transition: background .12s; }
+.toc a:hover { background: var(--panel-3); }
 
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
-  }
-  .infra-item {
-    padding: 12px 14px; background: var(--pink-50);
-    border: 1px solid rgba(153, 53, 86, 0.2); border-radius: 8px;
-    display: flex; flex-direction: column; gap: 6px; min-height: 72px; justify-content: space-between;
-  }
-  @media (prefers-color-scheme: dark) {
-    .infra-item { background: rgba(212, 83, 126, 0.12); border-color: rgba(212, 83, 126, 0.3); }
-  }
-  .infra-item .name { font-size: 14px; font-weight: 500; color: var(--pink-900); }
-  @media (prefers-color-scheme: dark) { .infra-item .name { color: #F4C0D1; } }
+section.panel {
+  background: var(--panel); border-radius: var(--radius-lg);
+  padding: 28px 32px; margin-bottom: 28px; box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+.section-head { margin-bottom: 22px; }
+.section-tag {
+  display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px;
+  border-radius: 4px; color: #fff; letter-spacing: 0.4px;
+  background: var(--tcsp); margin-bottom: 10px;
+}
+.section-tag.g { background: var(--book); }
+.section-tag.o { background: var(--unbook); }
+.section-head h2 { font-size: 19px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.section-head p { font-size: 13px; color: var(--text-2); line-height: 1.7; max-width: 900px; }
+.section-head p strong { color: var(--text); }
+.section-head ul.section-bullets { list-style: none; padding: 0; margin: 6px 0 0; max-width: 900px; }
+.section-head ul.section-bullets li { font-size: 13px; color: var(--text-2); line-height: 1.7; padding-left: 14px; position: relative; }
+.section-head ul.section-bullets li::before { content: '•'; position: absolute; left: 2px; color: var(--text-3); }
 
-  .channel-item {
-    padding: 14px 16px; border-radius: 10px;
-    display: flex; flex-direction: column; gap: 8px; min-height: 110px;
-  }
-  .channel-item.teal { background: var(--teal-50); border: 1px solid rgba(15, 110, 86, 0.2); }
-  .channel-item.amber { background: var(--amber-50); border: 1px solid rgba(186, 117, 23, 0.2); }
-  .channel-item.purple { background: var(--purple-50); border: 1px solid rgba(83, 74, 183, 0.2); }
-  @media (prefers-color-scheme: dark) {
-    .channel-item.teal { background: rgba(15, 110, 86, 0.2); border-color: rgba(29, 158, 117, 0.3); }
-    .channel-item.amber { background: rgba(186, 117, 23, 0.2); border-color: rgba(239, 159, 39, 0.3); }
-    .channel-item.purple { background: rgba(83, 74, 183, 0.2); border-color: rgba(127, 119, 221, 0.3); }
-  }
-  .channel-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .channel-name { font-size: 15px; font-weight: 600; }
-  .channel-item.teal .channel-name { color: var(--teal-900); }
-  .channel-item.amber .channel-name { color: var(--amber-900); }
-  .channel-item.purple .channel-name { color: var(--purple-900); }
-  @media (prefers-color-scheme: dark) {
-    .channel-item.teal .channel-name { color: #9FE1CB; }
-    .channel-item.amber .channel-name { color: #FAC775; }
-    .channel-item.purple .channel-name { color: #CECBF6; }
-  }
-  .channel-info { font-size: 12px; line-height: 1.6; }
-  .channel-item.teal .channel-info { color: var(--teal-800); }
-  .channel-item.amber .channel-info { color: var(--amber-800); }
-  .channel-item.purple .channel-info { color: var(--purple-800); }
-  @media (prefers-color-scheme: dark) {
-    .channel-item.teal .channel-info { color: #9FE1CB; }
-    .channel-item.amber .channel-info { color: #FAC775; }
-    .channel-item.purple .channel-info { color: #CECBF6; }
-  }
+/* ============================================================
+   4. SECTION 1: DIAGRAM LAYOUT
+   Obita 技术平台 (top) → 两个体内方框 → 虚线连体外框
+============================================================ */
+.s1-canvas { display: flex; flex-direction: column; align-items: center; }
 
-  .summary {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;
-  }
-  @media (max-width: 720px) { .summary { grid-template-columns: 1fr; } }
-  .summary-box { padding: 20px 22px; border-radius: 10px; }
-  .summary-box.sell { background: var(--teal-50); border: 1px solid rgba(15, 110, 86, 0.2); }
-  .summary-box.risk { background: var(--amber-50); border: 1px solid rgba(186, 117, 23, 0.2); }
-  @media (prefers-color-scheme: dark) {
-    .summary-box.sell { background: rgba(15, 110, 86, 0.2); border-color: rgba(29, 158, 117, 0.3); }
-    .summary-box.risk { background: rgba(186, 117, 23, 0.2); border-color: rgba(239, 159, 39, 0.3); }
-  }
-  .summary-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
-  .summary-box.sell h3 { color: var(--teal-900); }
-  .summary-box.risk h3 { color: var(--amber-900); }
-  @media (prefers-color-scheme: dark) {
-    .summary-box.sell h3 { color: #9FE1CB; }
-    .summary-box.risk h3 { color: #FAC775; }
-  }
-  .summary-box h4 { font-size: 13px; font-weight: 600; margin-top: 12px; margin-bottom: 6px; }
-  .summary-box.sell h4 { color: var(--teal-800); }
-  .summary-box.risk h4 { color: var(--amber-800); }
-  @media (prefers-color-scheme: dark) {
-    .summary-box.sell h4 { color: #9FE1CB; }
-    .summary-box.risk h4 { color: #FAC775; }
-  }
-  .summary-box ul { list-style: none; padding: 0; margin: 0; }
-  .summary-box li { font-size: 13px; line-height: 1.8; padding-left: 14px; position: relative; }
-  .summary-box li::before { content: '•'; position: absolute; left: 2px; }
-  .summary-box.sell li { color: var(--teal-800); }
-  .summary-box.risk li { color: var(--amber-800); }
-  @media (prefers-color-scheme: dark) {
-    .summary-box.sell li { color: #9FE1CB; }
-    .summary-box.risk li { color: #FAC775; }
-  }
-  .summary-box li .sub { display: block; color: var(--text-tertiary); font-size: 12px; padding-left: 0; }
+.platform-top {
+  padding: 10px 30px; background: var(--panel); border: 2px solid var(--border-strong);
+  border-radius: 8px; font-size: 15px; font-weight: 700; color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.platform-connector {
+  color: var(--text-3); width: 100%; height: 52px; display: block;
+  margin-top: 2px;
+}
+.platform-connector path { stroke: currentColor; }
 
-  .footer {
-    margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border);
-    font-size: 12px; color: var(--text-tertiary); text-align: center;
-  }
+/* S1 main grid: 2 cols × 2 rows; both entities in row 1, both outer rows in row 2 */
+.entity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 20px;
+  row-gap: 14px;
+  width: 100%;
+}
+@media (max-width: 900px) {
+  .entity-grid { grid-template-columns: 1fr; grid-template-rows: repeat(4, auto); }
+  .platform-connector { display: none; }
+  .entity.tcsp        { grid-column: 1; grid-row: 1; }
+  .outer-row.tcsp-outer { grid-column: 1; grid-row: 2; }
+  .entity.mso         { grid-column: 1; grid-row: 3; }
+  .outer-row.mso-outer  { grid-column: 1; grid-row: 4; }
+}
 
-  /* CEO 战略指引 */
-  .ceo-message {
-    background: linear-gradient(135deg, rgba(127, 119, 221, 0.08), rgba(55, 138, 221, 0.08));
-    border: 1px solid rgba(127, 119, 221, 0.25);
-    border-left: 3px solid var(--purple-400);
-    border-radius: 10px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-  }
-  @media (prefers-color-scheme: dark) {
-    .ceo-message {
-      background: linear-gradient(135deg, rgba(127, 119, 221, 0.15), rgba(55, 138, 221, 0.15));
-    }
-  }
-  .ceo-message .ceo-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--purple-800);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-  }
-  @media (prefers-color-scheme: dark) {
-    .ceo-message .ceo-label { color: #CECBF6; }
-  }
-  .ceo-message .ceo-body {
-    font-size: 13px;
-    color: var(--text-primary);
-    line-height: 1.7;
-  }
-  .ceo-message .ceo-body strong {
-    color: var(--purple-900);
-  }
-  @media (prefers-color-scheme: dark) {
-    .ceo-message .ceo-body strong { color: #CECBF6; }
-  }
+.entity {
+  border: 2px solid var(--tcsp-border); border-radius: var(--radius);
+  overflow: hidden; transition: box-shadow .15s;
+  display: flex; flex-direction: column;
+  background: var(--panel); min-width: 0;
+}
+.entity.tcsp { grid-column: 1; grid-row: 1; }
+.entity.mso  { grid-column: 2; grid-row: 1; border-color: var(--mso-border); }
+.entity:hover { box-shadow: var(--shadow-md); }
 
-  /* 发布计划 */
-  .releases {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-  @media (max-width: 900px) {
-    .releases { grid-template-columns: 1fr; }
-  }
-  .release {
-    border-radius: 10px;
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    border: 1px solid;
-  }
-  .release.r1 {
-    background: var(--teal-50);
-    border-color: rgba(15, 110, 86, 0.25);
-  }
-  .release.r2 {
-    background: var(--amber-50);
-    border-color: rgba(186, 117, 23, 0.25);
-  }
-  .release.r3 {
-    background: var(--purple-50);
-    border-color: rgba(83, 74, 183, 0.25);
-  }
-  @media (prefers-color-scheme: dark) {
-    .release.r1 { background: rgba(15, 110, 86, 0.2); border-color: rgba(29, 158, 117, 0.3); }
-    .release.r2 { background: rgba(186, 117, 23, 0.2); border-color: rgba(239, 159, 39, 0.3); }
-    .release.r3 { background: rgba(83, 74, 183, 0.2); border-color: rgba(127, 119, 221, 0.3); }
-  }
-  .release-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .release-num {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    opacity: 0.7;
-  }
-  .release-date {
-    font-size: 16px;
-    font-weight: 700;
-  }
-  .release.r1 .release-num, .release.r1 .release-date { color: var(--teal-900); }
-  .release.r2 .release-num, .release.r2 .release-date { color: var(--amber-900); }
-  .release.r3 .release-num, .release.r3 .release-date { color: var(--purple-900); }
-  @media (prefers-color-scheme: dark) {
-    .release.r1 .release-num, .release.r1 .release-date { color: #9FE1CB; }
-    .release.r2 .release-num, .release.r2 .release-date { color: #FAC775; }
-    .release.r3 .release-num, .release.r3 .release-date { color: #CECBF6; }
-  }
-  .release-scope {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .release-scope li {
-    font-size: 13px;
-    line-height: 1.5;
-    padding: 8px 10px;
-    background: rgba(255,255,255,0.5);
-    border-radius: 6px;
-  }
-  @media (prefers-color-scheme: dark) {
-    .release-scope li { background: rgba(255,255,255,0.05); }
-  }
-  .release.r1 .release-scope li { color: var(--teal-800); }
-  .release.r2 .release-scope li { color: var(--amber-800); }
-  .release.r3 .release-scope li { color: var(--purple-800); }
-  @media (prefers-color-scheme: dark) {
-    .release.r1 .release-scope li { color: #9FE1CB; }
-    .release.r2 .release-scope li { color: #FAC775; }
-    .release.r3 .release-scope li { color: #CECBF6; }
-  }
-  .release-note {
-    font-size: 11px;
-    color: var(--text-tertiary);
-    font-style: italic;
-  }
+.cap-list { flex: 0 0 auto; }
 
-  @media print {
-    body { background: white; }
-    .card, .summary-box, .infra-item, .channel-item, .release { break-inside: avoid; }
-  }
+/* Client row inside entity box */
+.inner-entities {
+  padding: 14px 16px;
+  background: var(--panel-2);
+  border-top: 1px dashed var(--border);
+  display: grid; gap: 10px;
+  flex: 0 0 auto;
+}
+.inner-entities.tcsp-inner { grid-template-columns: 1fr 1fr 1fr; }
+.inner-entities.mso-inner  { grid-template-columns: 1fr 1fr; }
+
+.sub-card {
+  padding: 14px 8px; border-radius: 8px; text-align: center;
+  font-size: 12.5px; font-weight: 600; line-height: 1.35;
+  border: 1.5px solid transparent; min-width: 0;
+  min-height: 58px; display: flex; flex-direction: column; justify-content: center;
+}
+.sub-card.client { background: var(--s1-client-bg); color: var(--text);    border-color: var(--s1-client-bd); }
+.sub-card.bvi    { background: var(--s1-bvi-bg);    color: var(--s1-bvi-fg); border-color: var(--s1-bvi-bd); }
+.sub-card .line2 { font-size: 10px; font-weight: 400; opacity: 0.85; margin-top: 4px; }
+
+/* MSO footer = panel-2 region containing clients + 体内渠道 (natural height, no gap) */
+.mso-footer {
+  flex: 0 0 auto;
+  background: var(--panel-2);
+  border-top: 1px dashed var(--border);
+  display: flex; flex-direction: column;
+}
+.entity.mso .inner-entities.mso-inner {
+  background: transparent; border-top: 0;
+  padding: 14px 16px 0;
+  flex: 0 0 auto;
+}
+.mso-bottom {
+  flex: 0 0 auto;
+  padding: 10px 16px 16px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.mso-bottom .info-card { grid-column: 1; }
+
+/* TCSP client area: grow to match MSO height so no visible gap at TCSP bottom */
+.entity.tcsp .inner-entities.tcsp-inner { flex: 1 0 auto; align-content: start; }
+
+/* Outer rows — 体外卡片 */
+.outer-row { display: grid; gap: 12px; }
+.outer-row.tcsp-outer { grid-column: 1; grid-row: 2; grid-template-columns: 1fr 1fr; }
+.outer-row.mso-outer  { grid-column: 2; grid-row: 2; grid-template-columns: 1fr 1fr; }
+.outer-row.mso-outer .info-card { grid-column: 1; }
+
+/* Info cards — shared shape for 体内渠道 / 体外渠道 / 体外LP */
+.info-card {
+  padding: 12px 14px; border-radius: 8px;
+  border: 1.5px solid transparent;
+  display: flex; flex-direction: column; gap: 2px;
+  min-height: 92px;
+}
+.info-card .info-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.info-card .info-body .cap-bullet { font-size: 11.5px; line-height: 1.55; color: inherit; }
+.info-card .info-body .cap-bullet .cbi,
+.info-card .info-body .cap-bullet .ustar { color: inherit; }
+.info-card.channel-in  { background: var(--s1-chan-in-bg);  border-color: var(--s1-chan-in-bd);  color: var(--s1-chan-in-fg); }
+.info-card.channel-out { background: var(--s1-chan-out-bg); border-color: var(--s1-chan-out-bd); color: var(--s1-chan-out-fg); }
+.info-card.lp-out      { background: var(--s1-lp-out-bg);   border-color: var(--s1-lp-out-bd);   color: var(--s1-lp-out-fg); }
+
+.entity-head {
+  padding: 16px 20px; color: #fff; background: var(--tcsp);
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.entity.mso .entity-head { background: var(--mso); }
+.entity-head .name { font-size: 17px; font-weight: 700; }
+.entity-head .meta { font-size: 12px; opacity: 0.85; }
+.entity-blurb { padding: 12px 20px; font-size: 12.5px; color: var(--text-2); background: var(--panel-2); border-bottom: 1px solid var(--border); }
+
+.cap-group { }
+.cap-group-head {
+  padding: 9px 18px 2px; display: flex; align-items: center; gap: 6px;
+  cursor: pointer; user-select: none; transition: background .1s;
+}
+.cap-group-head:hover { background: var(--panel-2); }
+.cap-group-head .chev { color: var(--text-4); font-size: 9px; transition: transform .15s; width: 10px; }
+.cap-group.open .cap-group-head .chev { transform: rotate(90deg); }
+.cap-group-head .cat { font-size: 13px; font-weight: 600; color: var(--text); }
+
+.cap-group-body { display: none; padding: 0 18px 8px 34px; }
+.cap-group.open .cap-group-body { display: block; }
+.cap-bullet {
+  font-size: 12px; color: var(--text-2); line-height: 1.55;
+  font-weight: 400;
+}
+.cap-bullet .cbi { color: var(--text); font-weight: 500; }
+.cap-bullet .ustar { color: var(--wip); font-weight: 700; cursor: help; margin-left: 1px; }
+.cap-bullet .sep { color: var(--text-4); margin: 0 4px; }
+
+/* S1 summary row (体内 vs 体外 visual) */
+.boundary-summary {
+  margin: 18px 0 0; padding: 14px 18px; background: var(--panel-2); border-radius: var(--radius);
+  border: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+@media (max-width: 720px) { .boundary-summary { grid-template-columns: 1fr; } }
+.bs-card { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 8px; }
+.bs-card.book { background: var(--book-bg); border-left: 3px solid var(--book-border); }
+.bs-card.unbook { background: var(--unbook-bg); border-left: 3px solid var(--unbook-border); border-left-style: dashed; }
+.bs-title { font-size: 13px; font-weight: 700; }
+.bs-title.book { color: var(--book); }
+.bs-title.unbook { color: var(--unbook); }
+.bs-desc { font-size: 12px; color: var(--text-2); }
+
+/* ============================================================
+   5. SECTION 2: MODULES
+============================================================ */
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: 14px 22px; padding: 14px 18px;
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 18px;
+}
+.filter-group { display: flex; flex-direction: column; gap: 6px; }
+.filter-label { font-size: 10.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  padding: 4px 11px; font-size: 12px; border-radius: 100px;
+  background: var(--panel); border: 1px solid var(--border); color: var(--text-2);
+  transition: all .12s; cursor: pointer;
+}
+.chip:hover { border-color: var(--border-strong); }
+.chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip.active.e-tcsp { background: var(--tcsp); color: #fff; border-color: var(--tcsp); }
+.chip.active.e-mso { background: var(--mso); color: #fff; border-color: var(--mso); }
+.chip.active.b-book { background: var(--book); color: #fff; border-color: var(--book); }
+.chip.active.b-unbook { background: var(--unbook); color: #fff; border-color: var(--unbook); }
+
+.module-stats {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; color: var(--text-3); margin: 0 4px 10px;
+}
+.module-stats button.reset { color: var(--tcsp); font-size: 12px; padding: 2px 8px; border-radius: 4px; }
+.module-stats button.reset:hover { background: var(--tcsp-bg); }
+
+.module-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  column-gap: 20px; row-gap: 10px;
+}
+@media (max-width: 900px) { .module-grid { grid-template-columns: 1fr; } }
+.module-grid .entity-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.module-grid .col-header {
+  padding: 10px 14px; color: #fff; border-radius: 8px;
+  font-weight: 700; font-size: 14px;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+}
+.module-grid .col-header.tcsp { background: var(--tcsp); }
+.module-grid .col-header.mso  { background: var(--mso); }
+.module-grid .col-header .count { font-size: 12px; font-weight: 400; opacity: 0.85; }
+.module-grid .col-empty { padding: 20px; text-align: center; color: var(--text-3); font-size: 12px; background: var(--panel-2); border-radius: 8px; }
+
+.mcard {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: visible; transition: border-color .12s, box-shadow .12s, transform .12s;
+  display: flex; flex-direction: column;
+}
+.mcard.e-TCSP { border-left: 3px solid var(--tcsp-border); }
+.mcard.e-MSO { border-left: 3px solid var(--mso-border); }
+.mcard:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+.mcard.open { box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+
+.mcard-top { padding: 12px 14px 10px; }
+.mcard-row1 { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.mcard .name { font-family: "SF Mono","Fira Code",monospace; font-size: 13px; font-weight: 700; color: var(--text); flex: 1; word-break: break-all; }
+.mcard .mcard-row1 .tags { margin-left: auto; flex-shrink: 0; }
+.mcard .ent-pill {
+  font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 3px; letter-spacing: 0.3px;
+}
+.mcard .ent-pill.TCSP { background: var(--tcsp-bg); color: var(--tcsp); }
+.mcard .ent-pill.MSO { background: var(--mso-bg); color: var(--mso); }
+.mcard .desc { font-size: 11.5px; color: var(--text-3); line-height: 1.5; margin-bottom: 8px; }
+.mcard .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.mtag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 3px; }
+/* 体内 tag inherits the owning entity's colour scheme */
+.mcard.e-TCSP .mtag.book { background: var(--tcsp-bg); color: var(--tcsp); }
+.mcard.e-MSO  .mtag.book { background: var(--mso-bg);  color: var(--mso); }
+.mtag.unbook { background: var(--unbook-bg); color: var(--unbook); border: 1px dashed var(--unbook-border); }
+.mtag.bundled { background: #FCE4EC; color: #C62828; }
+[data-theme="dark"] .mtag.bundled { background: rgba(233,30,99,0.2); color: #F48FB1; }
+
+.mcard-routes { display: block; padding: 10px 14px 14px; border-top: 1px solid var(--border); background: var(--panel-2); border-radius: 0 0 calc(var(--radius) - 1px) calc(var(--radius) - 1px); }
+.route-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--border); align-items: start; }
+.route-row:last-child { border-bottom: 0; }
+.route-provider { font-size: 11.5px; font-weight: 600; color: var(--text); }
+.route-pairs { font-size: 11px; color: var(--text-2); font-family: "SF Mono",monospace; word-break: normal; overflow-wrap: break-word; line-height: 1.6; }
+.route-pairs .faint { color: var(--text-4); font-size: 10.5px; font-family: inherit; margin-left: 4px; }
+
+/* Pairs hover popover — shows full list + copy button */
+.pairs-more {
+  position: relative; display: inline-block;
+  color: var(--tcsp); cursor: help;
+  text-decoration: underline dotted;
+  font-family: inherit; font-size: 11px;
+  padding: 0 2px; margin-left: 2px;
+}
+.pairs-more:focus { outline: 2px solid var(--tcsp); outline-offset: 1px; border-radius: 2px; }
+.pairs-popover {
+  display: none; position: absolute; bottom: calc(100% + 6px); left: 0;
+  background: var(--panel); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: 6px;
+  padding: 10px 12px; box-shadow: var(--shadow-md);
+  font-size: 11px; line-height: 1.6;
+  width: min(440px, 90vw); max-height: 260px; overflow-y: auto;
+  z-index: 100;
+  user-select: text; cursor: text;
+  font-family: "SF Mono","Fira Code",monospace;
+  text-decoration: none;
+}
+.pairs-more:hover .pairs-popover,
+.pairs-more:focus-within .pairs-popover,
+.pairs-popover:hover { display: block; }
+.pairs-popover .pp-count { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-family: inherit; }
+.pairs-popover .pp-text { word-break: normal; overflow-wrap: break-word; margin-bottom: 10px; }
+.pairs-popover .pp-copy {
+  padding: 5px 12px; font-size: 11px; font-weight: 600;
+  border-radius: 4px; background: var(--tcsp); color: #fff;
+  border: 0; cursor: pointer; font-family: inherit;
+  transition: background .12s;
+}
+.pairs-popover .pp-copy:hover { opacity: 0.88; }
+.pairs-popover .pp-copy.copied { background: var(--live); }
+
+.st { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; display: inline-block; }
+.st-live { color: var(--live); background: var(--live-bg); }
+.st-wip { color: var(--wip); background: var(--wip-bg); }
+.st-plan { color: var(--plan); background: var(--plan-bg); }
+.st-tbd { color: var(--tbd); background: var(--tbd-bg); }
+.st-live-asterisk { position: relative; }
+.st-live-asterisk::after { content: '*'; margin-left: 2px; font-weight: 700; }
+
+.no-match { padding: 60px 20px; text-align: center; color: var(--text-3); font-size: 13px; grid-column: 1 / -1; }
+
+/* ============================================================
+   6. SECTION 3: ORCHESTRATION
+============================================================ */
+.preset-bar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  padding: 12px 16px; background: var(--panel-2); border-radius: var(--radius);
+  border: 1px solid var(--border); margin-bottom: 14px;
+}
+.preset-bar .label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+.preset-btn {
+  padding: 6px 12px; font-size: 12px; font-weight: 500; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--text-2);
+  transition: all .12s;
+}
+.preset-btn:hover { border-color: var(--unbook-border); color: var(--unbook); }
+.preset-btn.active { background: var(--unbook); color: #fff; border-color: var(--unbook); }
+
+.orch-controls { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.orch-ctrl { display: flex; flex-direction: column; gap: 5px; min-width: 200px; flex: 1; }
+.orch-ctrl label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+.orch-ctrl select {
+  padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13px; background: var(--panel); color: var(--text); transition: border-color .12s;
+  cursor: pointer; width: 100%;
+}
+.orch-ctrl select:focus { border-color: var(--unbook); outline: 0; }
+.orch-ctrl select:disabled { background: var(--panel-3); color: var(--text-4); cursor: not-allowed; }
+
+.orch-result {}
+.path-summary-line {
+  font-size: 13px; color: var(--text-2); margin: 4px 2px 12px;
+}
+.path-summary-line b { color: var(--text); }
+
+.compare-table {
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 4px 0; margin-bottom: 16px; overflow-x: auto;
+}
+.compare-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.compare-table th, .compare-table td { padding: 9px 14px; text-align: left; vertical-align: middle; }
+.compare-table th { font-size: 10.5px; color: var(--text-3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+.compare-table tbody tr { cursor: pointer; transition: background .1s; border-bottom: 1px dashed var(--border); }
+.compare-table tbody tr:hover { background: var(--panel-3); }
+.compare-table tbody tr.hl { background: var(--tbd-bg); }
+.compare-table tbody tr:last-child { border-bottom: 0; }
+.compare-table .c-rank { font-weight: 700; color: var(--unbook); width: 32px; }
+.compare-table .c-name { font-weight: 600; color: var(--text); }
+.compare-table .c-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+
+.path-card {
+  background: var(--panel-2); border-radius: var(--radius); padding: 18px 22px;
+  margin-bottom: 12px; border-left: 4px solid var(--tcsp-border);
+  border: 1px solid var(--border); border-left: 4px solid var(--tcsp-border);
+  transition: box-shadow .15s;
+}
+.path-card.single-mso { border-left-color: var(--mso-border); }
+.path-card.cross { border-left-color: var(--unbook-border); }
+.path-card.warn { border-left-color: var(--wip); }
+.path-card.hl { box-shadow: 0 0 0 2px var(--tbd-bg); }
+
+.path-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.path-rank { font-size: 18px; font-weight: 800; color: var(--unbook); min-width: 28px; }
+.path-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.path-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+.ptag { font-size: 10px; padding: 2px 9px; border-radius: 10px; font-weight: 600; white-space: nowrap; }
+.ptag-steps { background: var(--panel-3); color: var(--text-2); }
+.ptag-tcsp  { background: var(--tcsp-bg); color: var(--tcsp); }
+.ptag-mso   { background: var(--mso-bg);  color: var(--mso); }
+.ptag-book  { background: var(--book-bg); color: var(--book); }
+.ptag-unbook { background: var(--unbook-bg); color: var(--unbook); border: 1px dashed var(--unbook-border); }
+.ptag-cross  { background: var(--unbook-bg); color: var(--unbook); border: 1px solid var(--unbook-border); }
+.ptag-sep { background: var(--tbd-bg); color: var(--tbd); }
+.ptag-bundled { background: #FCE4EC; color: #C62828; }
+[data-theme="dark"] .ptag-bundled { background: rgba(233,30,99,0.2); color: #F48FB1; }
+.ptag-live { background: var(--live-bg); color: var(--live); }
+.ptag-warn { background: var(--wip-bg); color: var(--wip); }
+
+.path-pipe { display: flex; align-items: flex-start; gap: 4px; overflow-x: auto; padding: 4px 2px 10px; }
+.path-step { display: flex; flex-direction: column; align-items: center; min-width: 140px; flex-shrink: 0; }
+.path-entity { font-size: 10px; font-weight: 700; color: var(--text-3); margin-bottom: 3px; letter-spacing: 0.5px; }
+.path-entity.TCSP { color: var(--tcsp); }
+.path-entity.MSO { color: var(--mso); }
+.path-mod {
+  padding: 7px 12px; border-radius: 6px; font-family: "SF Mono","Fira Code",monospace; font-size: 10.5px;
+  font-weight: 600; white-space: nowrap; text-align: center; line-height: 1.3;
+}
+.mod-TCSP   { background: var(--tcsp-bg); color: var(--tcsp); }
+.mod-MSO    { background: var(--mso-bg);  color: var(--mso); }
+.mod-unbook { background: var(--unbook-bg); color: var(--unbook); border: 1px dashed var(--unbook-border); }
+
+.path-detail { font-size: 10.5px; color: var(--text-2); margin-top: 4px; font-family: "SF Mono",monospace; text-align: center; }
+.path-provider { font-size: 10px; color: var(--text-3); margin-top: 2px; text-align: center; }
+.path-status { margin-top: 4px; }
+.path-arrow { color: var(--text-4); font-size: 20px; margin-top: 18px; flex-shrink: 0; }
+.path-cross { display: flex; flex-direction: column; align-items: center; margin: 0 6px; margin-top: 14px; flex-shrink: 0; }
+.path-cross-arrow { color: var(--unbook); font-size: 20px; font-weight: 800; }
+.path-cross-label { font-size: 9px; color: var(--unbook); font-weight: 700; letter-spacing: 0.3px; }
+
+.no-paths { padding: 40px; text-align: center; color: var(--text-3); font-size: 14px; background: var(--panel-2); border-radius: var(--radius); margin-top: 8px; }
+
+.uncertain-marker {
+  font-size: 10px; color: var(--tbd); cursor: help; margin-left: 3px;
+}
+
+/* ============================================================
+   7. LEGEND / FOOTER
+============================================================ */
+.legend-row {
+  display: flex; flex-wrap: wrap; gap: 14px; padding: 12px 16px;
+  background: var(--panel-2); border-radius: var(--radius); margin-top: 18px;
+  border: 1px solid var(--border); font-size: 12px; color: var(--text-2);
+}
+.legend-row .swatch { display: inline-flex; align-items: center; gap: 6px; }
+.swatch-box { width: 14px; height: 14px; border-radius: 3px; border: 1px solid transparent; flex-shrink: 0; }
+
+/* ============================================================
+   8. MISC
+============================================================ */
+.faint { color: var(--text-4); font-size: 11px; font-weight: 400; }
+.note-inline { font-size: 11px; color: var(--text-3); margin-left: 6px; font-weight: 400; }
+
+/* ============================================================
+   9. AUTH GATE
+============================================================ */
+#authOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(21,101,192,0.12), rgba(245,127,23,0.1));
+  backdrop-filter: blur(3px);
+  padding: 16px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-md);
+  padding: 22px;
+}
+.auth-card h2 { font-size: 18px; color: var(--text); margin-bottom: 6px; }
+.auth-sub { font-size: 12px; color: var(--text-3); margin-bottom: 16px; }
+.auth-form { display: grid; gap: 10px; }
+.auth-form label { font-size: 12px; color: var(--text-2); }
+.auth-form input {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  outline: none;
+}
+.auth-form input:focus { border-color: var(--tcsp-border); }
+.auth-submit {
+  margin-top: 4px;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--tcsp);
+  color: #fff;
+  font-weight: 600;
+}
+.auth-error { min-height: 18px; font-size: 12px; color: #C62828; }
+body.auth-locked .page { display: none; }
+body.auth-unlocked #authOverlay { display: none; }
+
+@media (max-width: 640px) {
+  .page { padding: 20px 12px 60px; }
+  section.panel { padding: 20px 16px; }
+  .topbar h1 { font-size: 22px; }
+  .orch-ctrl { min-width: 100%; }
+  .path-step { min-width: 120px; }
+}
 </style>
 </head>
-<body>
-<div class="container">
-
-<div class="header">
-<h1>Obita 产品进展看板</h1>
-<div class="meta">截至本周 · 阶段推进 + 对外口径</div>
+<body class="auth-locked">
+<div id="authOverlay" role="dialog" aria-modal="true" aria-label="登录">
+  <div class="auth-card">
+    <h2>登录后查看页面</h2>
+    <div class="auth-sub">请输入用户名和密码继续</div>
+    <form id="authForm" class="auth-form" autocomplete="off">
+      <div>
+        <label for="authUser">用户名</label>
+        <input id="authUser" type="text" name="username" required>
+      </div>
+      <div>
+        <label for="authPass">密码</label>
+        <input id="authPass" type="password" name="password" required>
+      </div>
+      <button type="submit" class="auth-submit">登录</button>
+      <div id="authError" class="auth-error" aria-live="polite"></div>
+    </form>
+  </div>
 </div>
 
-<div class="legend">
-<span class="legend-pill status-live">可展业</span>
-<span class="legend-pill status-dev">开发中</span>
-<span class="legend-pill status-integrating">联调中</span>
-<span class="legend-pill status-pending">等待对接</span>
-<span class="legend-desc">标准阶段:需求 → PRD → 开发 → 上线 → 可展业(仅稳定币 Payout / Checkout 含 API 联调)</span>
-</div>
+<div class="page">
 
-<!-- CEO 战略指引 -->
-<div class="ceo-message">
-<div class="ceo-label">CEO 指引 · 当前阶段</div>
-<div class="ceo-body">
-4/30 已奠定产品技术架构基础。<strong>当前处于 PMF(产品市场适配)阶段,需要快速产品迭代</strong> —— 平台建设适度克制,业务产品建设要激进。接下来每次发布都要产生对业务有<strong>明确新增支持</strong>的产品,产品和技术优先级紧盯业务。
-</div>
-</div>
+  <div class="topbar">
+    <div>
+      <h1>Obita 业务梳理</h1>
+      <div class="subtitle">2026-04-23 · Interactive v2 · 产研 + 运营 + 合规</div>
+    </div>
+    <div class="top-tools">
+      <button class="icon-btn" id="themeBtn" title="切换浅色/深色">🌓</button>
+    </div>
+  </div>
 
-<!-- 三次发布计划 -->
-<div class="section-header sec-1">接下来三次发布计划</div>
+  <nav class="toc">
+    <div class="toc-row">
+      <span class="toc-label">目录</span>
+      <a href="#s1">① 主体架构</a>
+      <a href="#s2">② 原子业务模块</a>
+      <a href="#s3">③ 业务编排</a>
+    </div>
+  </nav>
 
-<div class="releases">
+  <!-- ============================================================
+       SECTION 1: 主体关系
+  ============================================================ -->
+  <section class="panel" id="s1">
+    <div class="section-head">
+      <div class="section-tag">Section 1</div>
+      <h2>主体架构</h2>
+      <ul class="section-bullets">
+        <li>Obita 技术平台为持牌主体提供底层技术服务，每个账务体系完全独立。</li>
+        <li>体内（book）= 操作进入该主体账务、产生会计分录；体外（unbook）= 操作不产生会计分录，资金离开账务边界后在体外辅助追踪。</li>
+        <li>BVI 在 HK_TCSP 中同时是客户 C 与内部 LP（i.e. 客户对手方）。</li>
+      </ul>
+    </div>
+    <div class="s1-canvas">
+      <div class="platform-top">Obita 技术平台</div>
+      <svg class="platform-connector" viewBox="0 0 600 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <marker id="parr" markerWidth="7" markerHeight="6" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L7,3 L0,6" fill="currentColor"/></marker>
+        </defs>
+        <path d="M 300 0 V 20 H 150 V 48" fill="none" stroke-width="1.2" marker-end="url(#parr)"/>
+        <path d="M 300 0 V 20 H 450 V 48" fill="none" stroke-width="1.2" marker-end="url(#parr)"/>
+      </svg>
+      <div id="entityGrid" class="entity-grid"></div>
+    </div>
 
-<div class="release r1">
-<div class="release-head">
-<span class="release-num">第一次发布</span>
-<span class="release-date">5/6 左右</span>
-</div>
-<ul class="release-scope">
-<li>OTC 迁移完成,业务现状可用(充值 → 兑换 → 提现)</li>
-<li>稳定币 Payout 业务完整可用</li>
-<li>稳定币 Checkout 业务完整可用</li>
-</ul>
-<div class="release-note">原 4/30 目标推迟约一周</div>
-</div>
+    <div class="legend-row">
+      <span class="swatch"><span class="swatch-box" style="background:var(--tcsp-bg); border: 1px solid var(--tcsp-border);"></span>HK_TCSP</span>
+      <span class="swatch"><span class="swatch-box" style="background:var(--mso-bg); border: 1px solid var(--mso-border);"></span>HK_MSO</span>
+      <span class="swatch"><span class="swatch-box" style="background:var(--unbook-bg); border: 1.5px dashed var(--unbook-border);"></span>体外</span>
+    </div>
+  </section>
 
-<div class="release r2">
-<div class="release-head">
-<span class="release-num">第二次发布</span>
-<span class="release-date">待评估</span>
-</div>
-<ul class="release-scope">
-<li>SGB 渠道在 OTC 业务上可用</li>
-<li>Payout 增加法币渠道 Navro,业务可用</li>
-<li>数币 Invoice 业务可用</li>
-</ul>
-<div class="release-note">原 5/15 目标,具体时间待团队评估后确定</div>
-</div>
+  <!-- ============================================================
+       SECTION 2: 原子业务模块
+  ============================================================ -->
+  <section class="panel" id="s2">
+    <div class="section-head">
+      <div class="section-tag g">Section 2</div>
+      <h2>原子业务模块</h2>
+      <ul class="section-bullets">
+        <li>原子模块 = Obita 可独立发起的最小业务操作。</li>
+      </ul>
+    </div>
 
-<div class="release r3">
-<div class="release-head">
-<span class="release-num">第三次发布</span>
-<span class="release-date">5 月底前</span>
-</div>
-<ul class="release-scope">
-<li>端到端付款业务上线:小币种收款 → 香港稳定币 offramp</li>
-<li>接通 1-2 个渠道(Velafi 等)</li>
-</ul>
-<div class="release-note">目标 5 月底前完成首版本</div>
-</div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="module-stats">
+      <span id="moduleCount">显示 16 / 16 个模块</span>
+      <button class="reset" id="filterReset">清除筛选</button>
+    </div>
+    <div class="module-grid" id="moduleGrid"></div>
+  </section>
 
-</div>
+  <!-- ============================================================
+       SECTION 3: 业务编排
+  ============================================================ -->
+  <section class="panel" id="s3">
+    <div class="section-head">
+      <div class="section-tag o">Section 3</div>
+      <h2>业务编排</h2>
+      <ul class="section-bullets">
+        <li>给定端到端需求（服务类型 × 源资产 × 目标资产），自动生成所有可行路径并按推荐级排序。</li>
+        <li>每条路径展示模块序列、所属主体、服务方和状态。</li>
+      </ul>
+    </div>
 
-<!-- 板块一:业务支付产品 -->
-<div class="section-header sec-1">板块一 · 业务支付产品(对客)</div>
+    <div class="preset-bar" id="presetBar">
+      <span class="label">预设场景</span>
+    </div>
 
-<!-- ① 统一账户 — 稳定币充提 (无联调) -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">① 统一账户 — 稳定币充提</div>
-<span class="card-badge status-live">已可展业</span>
-</div>
-<div class="pipeline-row">
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">可展业</div></div>
-</div>
-</div>
-<div class="pitch teal">
-<span class="pitch-label">对外口径:</span>稳定币充值/提现能力已上线,销售/BD 可直接对客签约。
-</div>
-</div>
+    <div class="orch-controls">
+      <div class="orch-ctrl">
+        <label>服务类型</label>
+        <select id="selSvc"></select>
+      </div>
+      <div class="orch-ctrl">
+        <label>源资产</label>
+        <select id="selSrc" disabled><option value="">请先选服务类型</option></select>
+      </div>
+      <div class="orch-ctrl">
+        <label>目标资产</label>
+        <select id="selTgt" disabled><option value="">请先选服务类型</option></select>
+      </div>
+    </div>
 
-<!-- ② 统一账户 — 法币充提 (无联调) -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">② 统一账户 — 法币充提</div>
-</div>
+    <div class="orch-result" id="orchResult"></div>
 
-<div class="sub-line">
-<div class="sub-line-name">法币充值(SGB)</div>
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">可展业</div></div>
-</div>
-<span class="card-badge status-dev">4月底上线(配合手动流程)</span>
-</div>
-
-<div class="sub-line">
-<div class="sub-line-name">法币提现</div>
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">可展业</div></div>
-</div>
-<span class="card-badge status-dev">R1 · 5/6 上线</span>
-</div>
-
-<div class="pitch amber">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>法币充值(SGB)与法币提现 4 月底就绪,初期配合手动流程。</div>
-<div class="pitch-line"><span class="pitch-label">R2 升级:</span>SGB 渠道在 OTC 业务上自动化可用(第二次发布)。</div>
-<div class="pitch-line">SGB 渠道对接进度见板块三。</div>
-</div>
-</div>
-
-<!-- ③ Payout — 稳定币 (保留联调) -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">③ Payout — 稳定币</div>
-<span class="card-badge status-integrating">R1 · 5/6 · 联调 PalmPay</span>
-</div>
-<div class="pipeline-row">
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">API就绪</div></div>
-<div class="pipeline-step"><div class="step-dot integrating"></div><div class="step-label">联调</div></div>
-<div class="pipeline-step"><div class="step-dot waiting"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot waiting"></div><div class="step-label">可展业</div></div>
-</div>
-</div>
-<div class="pitch blue">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>稳定币 Payout API 已就绪,已对接 PalmPay 客户可直接使用。</div>
-<div class="pitch-line"><span class="pitch-label">风险:</span>依赖 PalmPay 集成排期(见板块三)。</div>
-</div>
-</div>
-
-<!-- ④ Payout — 法币 (无联调) -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">④ Payout — 法币</div>
-<span class="card-badge status-dev">R2 · 待评估</span>
-</div>
-<div class="pipeline-row">
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot waiting"></div><div class="step-label">可展业</div></div>
-</div>
-</div>
-<div class="pitch amber">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>法币 Payout 进入 R2 第二次发布,经 Navro 渠道出款。</div>
-<div class="pitch-line">Navro 渠道 4 月系统上线,R2 发布后即可对客展业。</div>
-</div>
-</div>
-
-<!-- ⑤ Collection — 稳定币收款 (Invoice 无联调, Checkout 有联调) -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">⑤ Collection — 稳定币收款</div>
-</div>
-
-<div class="sub-line">
-<div class="sub-line-name">Invoice(开票收款)</div>
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">可展业</div></div>
-</div>
-<span class="card-badge status-dev">R2 · 待评估</span>
-</div>
-
-<div class="sub-line">
-<div class="sub-line-name">Checkout 收银台</div>
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">联调</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">可展业</div></div>
-</div>
-<span class="card-badge status-dev">R1 · 5/6 上线</span>
-</div>
-
-<div class="pitch amber">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>Checkout 进入 R1(5/6 上线),Invoice 进入 R2(待评估)。</div>
-<div class="pitch-line"><span class="pitch-label">口径建议:</span>短期客户优先推 Checkout;需开票场景 R2 后承接。</div>
-<div class="pitch-line">两种方案可作为互补的产品组合向客户介绍。</div>
-</div>
-</div>
-
-<!-- ⑥ ObitaPocket (无联调) -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">⑥ ObitaPocket</div>
-<span class="card-badge status-dev">6月可展业</span>
-</div>
-<div class="pipeline-row">
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">可展业</div></div>
-</div>
-</div>
-<div class="pitch amber">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>ObitaPocket 预计 6 月可展业。</div>
-</div>
-</div>
-
-<!-- ⑦ U 卡 (无联调) -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">⑦ U 卡</div>
-<span class="card-badge status-dev">6月上线</span>
-</div>
-<div class="pipeline-row">
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">可展业</div></div>
-</div>
-</div>
-<div class="pitch amber">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>U 卡计划 6 月系统上线。</div>
-<div class="pitch-line">对接的 Wirex 渠道 6 月系统上线(见板块三)。</div>
-</div>
-</div>
-
-<!-- ⑧ Conversion -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">⑧ Conversion — 币种兑换</div>
-</div>
-
-<div class="sub-line">
-<div class="sub-line-name">稳定币 → 法币(USDT/USDC → USD)</div>
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">可展业</div></div>
-</div>
-<span class="card-badge status-live">已可展业</span>
-</div>
-
-<div class="sub-line">
-<div class="sub-line-name">产品升级:RFQ 重构</div>
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">可展业</div></div>
-</div>
-<span class="card-badge status-dev">R1 · 5/6 上线</span>
-</div>
-
-<div class="pitch teal">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>USDT/USDC → USD 兑换能力已可展业。</div>
-<div class="pitch-line"><span class="pitch-label">产品升级:</span>RFQ 询价与成交链路重构中,4 月底上线,报价效率与执行质量提升。</div>
-</div>
-</div>
-
-<!-- ⑨ 端到端付款 -->
-<div class="card">
-<div class="card-header">
-<div class="card-title">⑨ 端到端付款 — 小币种收款 → 香港稳定币 offramp</div>
-<span class="card-badge status-pending">R3 · 5 月底前</span>
-</div>
-<div class="pipeline-row">
-<div class="pipeline-steps">
-<div class="pipeline-step"><div class="step-dot done"></div><div class="step-label">需求</div></div>
-<div class="pipeline-step"><div class="step-dot active"></div><div class="step-label">PRD</div></div>
-<div class="pipeline-step"><div class="step-dot waiting"></div><div class="step-label">开发</div></div>
-<div class="pipeline-step"><div class="step-dot waiting"></div><div class="step-label">上线</div></div>
-<div class="pipeline-step"><div class="step-dot waiting"></div><div class="step-label">可展业</div></div>
-</div>
-</div>
-<div class="pitch blue">
-<div class="pitch-line"><span class="pitch-label">对外口径:</span>端到端付款链路 5 月底前首版本上线。</div>
-<div class="pitch-line">小币种收款 → 香港稳定币 offramp,首批接通 1-2 个渠道(Velafi 等)。</div>
-</div>
-</div>
-
-<!-- 板块二:基建能力 -->
-<div class="section-header sec-2">板块二 · 基建能力(对内)</div>
-
-<div class="card">
-<div class="card-header">
-<div class="card-title">基建能力 · 7 条主线</div>
-</div>
-<div class="grid">
-<div class="infra-item">
-<div class="name">账务系统</div>
-<span class="card-badge status-dev">4月底上线</span>
-</div>
-<div class="infra-item">
-<div class="name">金融交换</div>
-<span class="card-badge status-dev">4月底上线</span>
-</div>
-<div class="infra-item">
-<div class="name">支付核心</div>
-<span class="card-badge status-dev">4月底上线</span>
-</div>
-<div class="infra-item">
-<div class="name">风控系统</div>
-<span class="card-badge status-dev">4月底上线</span>
-</div>
-<div class="infra-item">
-<div class="name">渠道对账与清结算</div>
-<span class="card-badge status-integrating">5月上线</span>
-</div>
-<div class="infra-item">
-<div class="name">两码一号改造</div>
-<span class="card-badge status-integrating">5月完成</span>
-</div>
-<div class="infra-item">
-<div class="name">会员域</div>
-<span class="card-badge status-pending">5月启动并上线</span>
-</div>
-</div>
-</div>
-
-<!-- 板块三:渠道对接 -->
-<div class="section-header sec-3">板块三 · 渠道对接</div>
-
-<div class="card">
-<div class="card-header">
-<div class="card-title">支撑业务能力落地的外部渠道</div>
-</div>
-<div class="grid">
-
-<div class="channel-item teal">
-<div class="channel-header">
-<div class="channel-name">PalmPay</div>
-<span class="card-badge status-integrating">联调中</span>
-</div>
-<div class="channel-info">
-<div>用途:稳定币 Payout 出金</div>
-<div>状态:API 已就绪,等集成</div>
-<div>影响:能力 ③ 落地节奏</div>
-</div>
-</div>
-
-<div class="channel-item amber">
-<div class="channel-header">
-<div class="channel-name">Navro</div>
-<span class="card-badge status-dev">4月系统上线</span>
-</div>
-<div class="channel-info">
-<div>用途:法币 Payout 出金</div>
-<div>状态:渠道对接中</div>
-<div>影响:能力 ④ 5 月可展业</div>
-</div>
-</div>
-
-<div class="channel-item amber">
-<div class="channel-header">
-<div class="channel-name">SGB</div>
-<span class="card-badge status-dev">对接中</span>
-</div>
-<div class="channel-info">
-<div>用途:法币充值</div>
-<div>状态:渠道对接中</div>
-<div>影响:能力 ② 4 月底上线</div>
-</div>
-</div>
-
-<div class="channel-item amber">
-<div class="channel-header">
-<div class="channel-name">Wirex</div>
-<span class="card-badge status-dev">6月系统上线</span>
-</div>
-<div class="channel-info">
-<div>用途:U 卡发卡</div>
-<div>状态:渠道对接中</div>
-<div>影响:能力 ⑦ 6 月上线</div>
-</div>
-</div>
-
-<div class="channel-item purple">
-<div class="channel-header">
-<div class="channel-name">Velafi 等</div>
-<span class="card-badge status-pending">等待对接</span>
-</div>
-<div class="channel-info">
-<div>用途:小币种收款</div>
-<div>状态:R3 阶段接入</div>
-<div>影响:能力 ⑨ 端到端付款</div>
-</div>
-</div>
-
-<div class="channel-item purple">
-<div class="channel-header">
-<div class="channel-name">OSL</div>
-<span class="card-badge status-pending">等待对接</span>
-</div>
-<div class="channel-info">
-<div>用途:数币托管</div>
-<div>状态:等待对接启动</div>
-</div>
-</div>
-
-<div class="channel-item purple">
-<div class="channel-header">
-<div class="channel-name">Hashkey</div>
-<span class="card-badge status-pending">等待对接</span>
-</div>
-<div class="channel-info">
-<div>用途:数币托管</div>
-<div>状态:等待对接启动</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<!-- 本周聚焦 -->
-<div class="section-header sec-1" style="background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary);">本周聚焦 · 给各部门的要点</div>
-
-<div class="summary">
-
-<div class="summary-box sell">
-<h3>销售 / BD 可卖什么</h3>
-<h4>现在可展业</h4>
-<ul>
-<li>稳定币充提(统一账户)</li>
-<li>稳定币 Payout(已对接 PalmPay 客户)</li>
-<li>Conversion 稳定币 → 法币(USDT/USDC → USD)</li>
-</ul>
-<h4>R1(5/6)交付</h4>
-<ul>
-<li>OTC 业务现状可用(充值 → 兑换 → 提现)</li>
-<li>稳定币 Payout 完整可用</li>
-<li>稳定币 Checkout 完整可用</li>
-<li>Conversion RFQ 重构升级</li>
-</ul>
-<h4>R2(待评估)交付</h4>
-<ul>
-<li>SGB 渠道在 OTC 业务上可用</li>
-<li>法币 Payout(Navro)</li>
-<li>稳定币 Invoice</li>
-</ul>
-<h4>R3(5 月底前)交付</h4>
-<ul>
-<li>端到端付款:小币种收款 → 香港 offramp</li>
-</ul>
-<h4>后续节奏</h4>
-<ul>
-<li>ObitaPocket、U 卡(Wirex)6 月</li>
-</ul>
-</div>
-
-<div class="summary-box risk">
-<h3>关键风险 / 依赖</h3>
-<ul>
-<li>R1 推迟一周(4/30 → 5/6),后续节奏需保住</li>
-<li>R2 时间未定,需团队尽快评估给出</li>
-<li>PalmPay 集成排期<br><span class="sub">→ 影响 R1 稳定币 Payout 落地</span></li>
-<li>Navro 渠道对接进度<br><span class="sub">→ 影响 R2 法币 Payout</span></li>
-<li>SGB 渠道对接进度<br><span class="sub">→ R1 配合手动流程,R2 自动化</span></li>
-<li>Velafi 等小币种收款渠道<br><span class="sub">→ R3 端到端付款关键依赖</span></li>
-<li>OSL / Hashkey 托管对接<br><span class="sub">尚未启动,需 BD 推动</span></li>
-<li>Wirex 渠道对接进度<br><span class="sub">→ 影响 U 卡 6 月上线</span></li>
-</ul>
-</div>
+    <div class="legend-row">
+      <span class="swatch"><span class="swatch-box" style="background:var(--tcsp-bg); border: 1px solid var(--tcsp-border);"></span>HK_TCSP</span>
+      <span class="swatch"><span class="swatch-box" style="background:var(--mso-bg); border: 1px solid var(--mso-border);"></span>HK_MSO</span>
+      <span class="swatch"><span class="swatch-box" style="background:var(--unbook-bg); border: 1.5px solid var(--unbook-border);"></span>跨主体</span>
+      <span class="swatch"><span class="swatch-box" style="background:var(--unbook-bg); border: 1.5px dashed var(--unbook-border);"></span>体外</span>
+    </div>
+  </section>
 
 </div>
 
-<div class="footer">
-Obita 产品进展看板 · 周会同步版本
-</div>
-
-</div>
-<!-- obita-auth-snippet:start -->
-<style>
-  #obita-auth-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    background: rgba(15, 23, 42, 0.92);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  #obita-auth-card {
-    width: 100%;
-    max-width: 360px;
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-  #obita-auth-card h2 { margin: 0 0 12px 0; font-size: 18px; }
-  #obita-auth-card label { display: block; margin: 10px 0 6px; font-size: 13px; color: #334155; }
-  #obita-auth-card input {
-    width: 100%;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
-  }
-  #obita-auth-card button {
-    margin-top: 14px;
-    width: 100%;
-    border: 0;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
-    color: #fff;
-    background: #0f766e;
-    cursor: pointer;
-  }
-  #obita-auth-error { color: #b91c1c; min-height: 20px; margin-top: 8px; font-size: 13px; }
-</style>
-<div id="obita-auth-overlay">
-  <form id="obita-auth-card" autocomplete="off">
-    <h2>访问验证</h2>
-    <label for="obita-auth-user">用户名</label>
-    <input id="obita-auth-user" name="username" required>
-    <label for="obita-auth-pass">密码</label>
-    <input id="obita-auth-pass" name="password" type="password" required>
-    <button type="submit">登录</button>
-    <div id="obita-auth-error"></div>
-  </form>
-</div>
 <script>
-  (function () {
-    var form = document.getElementById('obita-auth-card');
-    var user = document.getElementById('obita-auth-user');
-    var pass = document.getElementById('obita-auth-pass');
-    var error = document.getElementById('obita-auth-error');
-    var overlay = document.getElementById('obita-auth-overlay');
-    if (!form || !user || !pass || !error || !overlay) return;
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (user.value.trim() === 'tony' && pass.value === 'tototony') {
-        overlay.parentNode.removeChild(overlay);
-        return;
-      }
-      error.textContent = '用户名或密码错误';
-      pass.value = '';
-      pass.focus();
+/* ============================================================
+   DATA LAYER
+============================================================ */
+
+const CATS = {
+  VELAFI: ['ARS','BOB','BRL','CLP','COP','MXN','PEN'],
+  YCARD:  ['BWP','GHS','KES','MWK','MZN','NGN','RWF','TZS','UGX','XAF','XOF','ZAR','ZMW'],
+  NL14:   ['AUD','BGN','CAD','CHF','CZK','DKK','EUR','GBP','HUF','NOK','NZD','PLN','RON','SEK'],
+  NB41:   ['BRL','HKD','IDR','INR','KRW','MXN','MYR','NGN','PHP','SGD','TRY','VND'],
+  KSHER:  ['THB','PHP','IDR','MYR','VND']
+};
+const isS = (c) => c === 'USDT' || c === 'USDC';
+const has = (arr, v) => arr.indexOf(v) >= 0;
+
+// ----- Entities -----
+// Cap-list = Obita Fiat Vault + Obita Crypto Vault + LP(体内); 其余 (体外渠道/LP/MSO体内渠道) 独立成卡
+const ENTITIES = {
+  TCSP: {
+    name: 'HK_TCSP', holder: 'WF', license: 'TCSP 牌照', moduleCount: 9,
+    blurb: 'Rail 1 · 稳定币链路 · 托管+信托。所有渠道均为体外（不进账务）。',
+    groups: [
+      { cat: 'Obita Fiat Vault', items: [
+        { n: 'GLDB', s: 'live' }, { n: 'SGB', s: 'live' }, { n: 'OCBC HK', s: 'wip' }
+      ]},
+      { cat: 'Obita Crypto Vault', items: [
+        { n: 'COBO', s: 'live' }, { n: 'Hashkey Custody', s: 'wip' }, { n: 'OSL Custody', s: 'wip' }
+      ]}
+    ],
+    innerChannel: null,
+    outerCards: [
+      { type: 'channel-out', title: '渠道 (体外)', items: [
+        { n: 'Velafi', s: 'live' }, { n: 'Yellowcard', s: 'live' }, { n: 'Holdstation', s: 'wip' }
+      ]},
+      { type: 'lp-out', title: 'LP (体外)', items: [
+        { n: 'LTP', s: 'live' }, { n: 'Hashkey', s: 'wip' }, { n: 'OSL', s: 'wip' }, { n: 'OpenFX', s: 'wip' }
+      ]}
+    ]
+  },
+  MSO: {
+    name: 'HK_MSO', holder: 'XFacil', license: 'MSO 牌照', moduleCount: 7,
+    blurb: 'Rail 2 · 法币链路 · 汇款服务。渠道大部分为体内（进账务）。',
+    groups: [
+      { cat: 'Obita Fiat Vault', items: [
+        { n: 'KGI', s: 'wip' }, { n: 'SGB', s: 'wip' }, { n: 'OCBC HK', s: 'wip' }, { n: 'SCB', s: 'wip' }
+      ]}
+    ],
+    innerChannel: { type: 'channel-in', title: '渠道 (体内)', items: [
+      { n: 'Navro', s: 'wip' }, { n: 'Verto', s: 'wip' }, { n: 'Onafriq', s: 'wip' }, { n: 'Ksher', s: 'wip' }
+    ]},
+    outerCards: []
+  }
+};
+
+// ----- 16 Atomic modules -----
+// tags: book / unbook / bundled
+// dir: deposit / withdrawal / collection / payout / conversion
+// boundary: book / unbook
+const MODULES = [
+  // HK_TCSP (9)
+  { id: 'stable_deposit', e: 'TCSP', asset: 'stable', dir: 'deposit', boundary: 'book',
+    desc: '客户充值 USDT/USDC 到账户', tags: ['book'],
+    routes: [{ p: 'Obita Stablecoin Vault', pairs: ['USDT', 'USDC'], s: 'live' }] },
+  { id: 'stable_withdrawal', e: 'TCSP', asset: 'stable', dir: 'withdrawal', boundary: 'book',
+    desc: '客户提取 USDT/USDC 到自己钱包', tags: ['book'],
+    routes: [{ p: 'Obita Stablecoin Vault', pairs: ['USDT', 'USDC'], s: 'live' }] },
+  { id: 'stable_collection', e: 'TCSP', asset: 'stable', dir: 'collection', boundary: 'book',
+    desc: '客户的收款人付入 USDT/USDC', tags: ['book'],
+    routes: [{ p: 'Obita Stablecoin Vault', pairs: ['USDT', 'USDC'], s: 'plan' }] },
+  { id: 'stable_payout', e: 'TCSP', asset: 'stable', dir: 'payout', boundary: 'book',
+    desc: '付 USDT/USDC 给收款人，无 FX', tags: ['book'],
+    routes: [{ p: 'Obita Stablecoin Vault', pairs: ['USDT', 'USDC'], s: 'plan' }] },
+  { id: 'fiat_deposit', e: 'TCSP', asset: 'fiat', dir: 'deposit', boundary: 'book',
+    desc: '客户入金 USD 到账户', tags: ['book'],
+    routes: [{ p: 'Obita Fiat Vault', pairs: ['USD'], s: 'live' }] },
+  { id: 'fiat_withdrawal', e: 'TCSP', asset: 'fiat', dir: 'withdrawal', boundary: 'book',
+    desc: '客户提取 USD', tags: ['book'],
+    routes: [{ p: 'Obita Fiat Vault', pairs: ['USD'], s: 'live' }] },
+  { id: 'conversion_internal', e: 'TCSP', asset: 'conversion', dir: 'conversion', boundary: 'book',
+    desc: 'USDT/USDC ↔ USD，对手方 BVI（内部 LP）', tags: ['book'],
+    routes: [{ p: 'Obita Internal LP', pairs: ['USDT/USD', 'USDC/USD', 'USDT/USDC'], s: 'live' }] },
+  { id: 'conversion_payout_unbook', e: 'TCSP', asset: 'conversion', dir: 'payout', boundary: 'unbook',
+    desc: '换汇+交付 bundled，渠道外执行，不入账', tags: ['unbook', 'bundled'],
+    routes: [
+      { p: 'Velafi', pairs: ['USDT/MXN','USDT/ARS','USDT/BRL','USDT/CLP','USDT/COP','USDT/BOB','USDT/PEN','USDC/MXN','USDC/ARS','USDC/BRL','USDC/CLP','USDC/COP','USDC/BOB','USDC/PEN'], s: 'live' },
+      { p: 'Yellowcard', pairs: ['USDT/KES','USDT/TZS','USDT/UGX','USDT/RWF','USDT/ZMW','USDT/MWK','USDT/ZAR','USDT/XOF','USDT/XAF','USDT/BWP','USDT/NGN','USDT/GHS','USDT/MZN','USDC/KES','USDC/TZS','USDC/UGX','USDC/RWF','USDC/ZMW','USDC/MWK','USDC/ZAR','USDC/XOF','USDC/XAF','USDC/BWP','USDC/NGN','USDC/GHS','USDC/MZN'], s: 'live' }
+    ]},
+  { id: 'collection_conversion_unbook', e: 'TCSP', asset: 'conversion', dir: 'collection', boundary: 'unbook',
+    desc: '收款+换汇 bundled，渠道外执行，不入账', tags: ['unbook', 'bundled'],
+    routes: [
+      { p: 'Velafi', pairs: ['USDT/MXN','USDT/ARS','USDT/BRL','USDT/CLP','USDT/COP','USDT/BOB','USDT/PEN','USDC/MXN','USDC/ARS','USDC/BRL','USDC/CLP','USDC/COP','USDC/BOB','USDC/PEN'], s: 'live' },
+      { p: 'Yellowcard', pairs: ['USDT/KES','USDT/TZS','USDT/UGX','USDT/RWF','USDT/ZMW','USDT/MWK','USDT/ZAR','USDT/XOF','USDT/XAF','USDT/BWP','USDT/NGN','USDT/GHS','USDT/MZN','USDC/KES','USDC/TZS','USDC/UGX','USDC/RWF','USDC/ZMW','USDC/MWK','USDC/ZAR','USDC/XOF','USDC/XAF','USDC/BWP','USDC/NGN','USDC/GHS','USDC/MZN'], s: 'live' }
+    ]},
+
+  // HK_MSO (7)
+  { id: 'fiat_deposit', e: 'MSO', asset: 'fiat', dir: 'deposit', boundary: 'book',
+    desc: '客户入金 USD via SGB', tags: ['book'],
+    routes: [{ p: 'Obita Fiat Vault', pairs: ['USD'], s: 'plan' }] },
+  { id: 'fiat_withdrawal', e: 'MSO', asset: 'fiat', dir: 'withdrawal', boundary: 'book',
+    desc: '客户提取 USD', tags: ['book'],
+    routes: [{ p: 'Obita Fiat Vault', pairs: ['USD'], s: 'plan' }] },
+  { id: 'fiat_collection', e: 'MSO', asset: 'fiat', dir: 'collection', boundary: 'book',
+    desc: '收同币种法币（via SGB 或 Navro local account）', tags: ['book'],
+    routes: [
+      { p: 'Obita Fiat Vault', pairs: ['USD'], s: 'plan' },
+      { p: 'Navro', pairs: CATS.NL14, s: 'plan', full: true }
+    ]},
+  { id: 'fiat_payout', e: 'MSO', asset: 'fiat', dir: 'payout', boundary: 'book',
+    desc: '付同币种法币（via SGB 或 Navro local account）', tags: ['book'],
+    routes: [
+      { p: 'Obita Fiat Vault', pairs: ['USD'], s: 'plan' },
+      { p: 'Navro', pairs: CATS.NL14, s: 'plan', full: true }
+    ]},
+  { id: 'conversion_book', e: 'MSO', asset: 'conversion', dir: 'conversion', boundary: 'book',
+    desc: '可分离 FX，渠道有 local account', tags: ['book'],
+    routes: [
+      { p: 'Navro', pairs: ['AUD/USD','EUR/USD','GBP/USD','NZD/USD','USD/BGN','USD/CAD','USD/CHF','USD/CZK','USD/DKK','USD/HUF','USD/NOK','USD/PLN','USD/RON','USD/SEK'], s: 'plan', full: true }
+    ]},
+  { id: 'conversion_payout_book', e: 'MSO', asset: 'conversion', dir: 'payout', boundary: 'book',
+    desc: '换汇+交付 bundled，渠道无 local account', tags: ['book', 'bundled'],
+    routes: [
+      { p: 'Navro', pairs: CATS.NB41.map(c => 'USD/' + c), s: 'plan', full: true }
+    ]},
+  { id: 'collection_conversion_book', e: 'MSO', asset: 'conversion', dir: 'collection', boundary: 'book',
+    desc: '收款+换汇 bundled，渠道无 local account', tags: ['book', 'bundled'],
+    routes: [
+      { p: 'Navro', pairs: ['N/A'], s: 'plan' },
+      { p: 'Ksher', pairs: ['USD/THB','USD/PHP','USD/IDR','USD/MYR','USD/VND'], s: 'plan' }
+    ]}
+];
+
+// ----- 5 Preset scenarios -----
+const PRESETS = [
+  { n: 'USD → USDT on-ramp',    svc: 'onramp',     src: 'USD',  tgt: 'USDT', tag: 'TCSP 入金 · 3 步单主体' },
+  { n: 'USDT → USD off-ramp',   svc: 'offramp',    src: 'USDT', tgt: 'USD',  tag: 'TCSP 出金 · 3 步单主体' },
+  { n: 'USDT → BRL payout',     svc: 'payout',     src: 'USDT', tgt: 'BRL',  tag: '单主体 TCSP unbook (Velafi)' },
+  { n: 'MXN → USDT collection', svc: 'collection', src: 'MXN',  tgt: 'USDT', tag: '单主体 TCSP unbook (Velafi)' },
+  { n: 'USDT → EUR payout',     svc: 'payout',     src: 'USDT', tgt: 'EUR',  tag: '跨主体 separable FX (Navro)' },
+  { n: 'USD → BRL payout',      svc: 'payout',     src: 'USD',  tgt: 'BRL',  tag: 'USD hub 对照组' },
+  { n: 'THB → USD collection',  svc: 'collection', src: 'THB',  tgt: 'USD',  tag: 'MSO Ksher bundled collection' },
+  { n: 'THB → USDT collection', svc: 'collection', src: 'THB',  tgt: 'USDT', tag: '跨主体 Ksher bundled → Stable' }
+];
+
+/* ============================================================
+   ROUTING ENGINE — from v1, cleaned up
+============================================================ */
+const M = (mod, e, detail, provider, status, uncertain) => ({
+  m: mod, e, d: detail, p: provider, s: status, u: !!uncertain
+});
+const X = () => ({ cross: true });
+
+function findPaths(svc, src, tgt) {
+  if (!svc || !src || !tgt || src === tgt) return [];
+  const P = [];
+  if (svc === 'payout') payoutPaths(src, tgt, P);
+  else if (svc === 'collection') collectPaths(src, tgt, P);
+  else if (svc === 'conversion') convertPaths(src, tgt, P);
+  else if (svc === 'onramp') onRampPaths(src, tgt, P);
+  else if (svc === 'offramp') offRampPaths(src, tgt, P);
+  return rankPaths(P);
+}
+
+// On-ramp: 客户法币 → 客户稳定币（带出金到客户钱包）— 仅 USD → USDT/USDC，3 步单主体 TCSP
+function onRampPaths(s, t, P) {
+  if (s === 'USD' && isS(t)) P.push({
+    n: 'TCSP On-ramp · USD → ' + t,
+    tg: ['体内', '单主体 TCSP'],
+    steps: [
+      M('fiat_deposit', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+      M('conversion_internal', 'TCSP', 'USD/' + t, 'Obita Internal LP', 'live'),
+      M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+    ]
+  });
+}
+
+// Off-ramp: 客户稳定币 → 客户法币（带出金到客户银行）— 仅 USDT/USDC → USD，3 步单主体 TCSP
+function offRampPaths(s, t, P) {
+  if (isS(s) && t === 'USD') P.push({
+    n: 'TCSP Off-ramp · ' + s + ' → USD',
+    tg: ['体内', '单主体 TCSP'],
+    steps: [
+      M('stable_deposit', 'TCSP', s, 'Obita Stablecoin Vault', 'live'),
+      M('conversion_internal', 'TCSP', s + '/USD', 'Obita Internal LP', 'live'),
+      M('fiat_withdrawal', 'TCSP', 'USD', 'Obita Fiat Vault', 'live')
+    ]
+  });
+}
+
+function payoutPaths(s, t, P) {
+  // === STABLE source ===
+  if (isS(s)) {
+    if (has(CATS.VELAFI, t)) P.push({
+      n: 'Unbook Payout via Velafi',
+      tg: ['体外', '单主体 TCSP', 'bundled'],
+      steps: [
+        M('stable_deposit', 'TCSP', s, 'Obita Stablecoin Vault', 'live'),
+        M('conversion_payout_unbook', 'TCSP', s+'/'+t, 'Velafi', 'live')
+      ]
     });
-    user.focus();
-  })();
+    if (has(CATS.YCARD, t)) P.push({
+      n: 'Unbook Payout via Yellowcard',
+      tg: ['体外', '单主体 TCSP', 'bundled'],
+      steps: [
+        M('stable_deposit', 'TCSP', s, 'Obita Stablecoin Vault', 'live'),
+        M('conversion_payout_unbook', 'TCSP', s+'/'+t, 'Yellowcard', 'live')
+      ]
+    });
+    if (t === 'USD') P.push({
+      n: '跨主体 USD Payout',
+      tg: ['体内', '跨主体'],
+      steps: [
+        M('stable_deposit', 'TCSP', s, 'Obita Stablecoin Vault', 'live'),
+        M('conversion_internal', 'TCSP', s+'/USD', 'Obita Internal LP', 'live'),
+        M('fiat_withdrawal', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        X(),
+        M('fiat_deposit', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        M('fiat_payout', 'MSO', 'USD', 'Obita Fiat Vault', 'plan')
+      ]
+    });
+    if (has(CATS.NL14, t)) P.push({
+      n: '跨主体 Separable FX (Navro)',
+      tg: ['体内', '跨主体', '可分离'],
+      steps: [
+        M('stable_deposit', 'TCSP', s, 'Obita Stablecoin Vault', 'live'),
+        M('conversion_internal', 'TCSP', s+'/USD', 'Obita Internal LP', 'live'),
+        M('fiat_withdrawal', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        X(),
+        M('fiat_deposit', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        M('conversion_book', 'MSO', 'USD/'+t, 'Navro', 'plan'),
+        M('fiat_payout', 'MSO', t, 'Navro', 'plan')
+      ]
+    });
+    if (has(CATS.NB41, t)) P.push({
+      n: '跨主体 Bundled FX+Payout (Navro)',
+      tg: ['体内', '跨主体', 'bundled'],
+      steps: [
+        M('stable_deposit', 'TCSP', s, 'Obita Stablecoin Vault', 'live'),
+        M('conversion_internal', 'TCSP', s+'/USD', 'Obita Internal LP', 'live'),
+        M('fiat_withdrawal', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        X(),
+        M('fiat_deposit', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        M('conversion_payout_book', 'MSO', 'USD/'+t, 'Navro', 'plan')
+      ]
+    });
+  }
+  // === USD source ===
+  if (s === 'USD') {
+    if (has(CATS.VELAFI, t)) P.push({
+      n: 'TCSP Convert → Unbook Payout (Velafi)',
+      tg: ['体外', '单主体 TCSP'],
+      steps: [
+        M('fiat_deposit', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        M('conversion_internal', 'TCSP', 'USD/USDT', 'Obita Internal LP', 'live'),
+        M('conversion_payout_unbook', 'TCSP', 'USDT/'+t, 'Velafi', 'live')
+      ]
+    });
+    if (has(CATS.YCARD, t)) P.push({
+      n: 'TCSP Convert → Unbook Payout (Yellowcard)',
+      tg: ['体外', '单主体 TCSP'],
+      steps: [
+        M('fiat_deposit', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        M('conversion_internal', 'TCSP', 'USD/USDT', 'Obita Internal LP', 'live'),
+        M('conversion_payout_unbook', 'TCSP', 'USDT/'+t, 'Yellowcard', 'live')
+      ]
+    });
+    if (has(CATS.NL14, t)) P.push({
+      n: 'MSO Separable FX (Navro)',
+      tg: ['体内', '单主体 MSO', '可分离'],
+      steps: [
+        M('fiat_deposit', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        M('conversion_book', 'MSO', 'USD/'+t, 'Navro', 'plan'),
+        M('fiat_payout', 'MSO', t, 'Navro', 'plan')
+      ]
+    });
+    if (has(CATS.NB41, t)) P.push({
+      n: 'MSO Bundled FX+Payout (Navro)',
+      tg: ['体内', '单主体 MSO', 'bundled'],
+      steps: [
+        M('fiat_deposit', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        M('conversion_payout_book', 'MSO', 'USD/'+t, 'Navro', 'plan')
+      ]
+    });
+  }
+}
+
+function collectPaths(s, t, P) {
+  if (isS(t)) {
+    if (has(CATS.VELAFI, s)) P.push({
+      n: 'Unbook Collection via Velafi',
+      tg: ['体外', '单主体 TCSP', 'bundled'],
+      steps: [
+        M('collection_conversion_unbook', 'TCSP', t+'/'+s, 'Velafi', 'live'),
+        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+      ]
+    });
+    if (has(CATS.YCARD, s)) P.push({
+      n: 'Unbook Collection via Yellowcard',
+      tg: ['体外', '单主体 TCSP', 'bundled'],
+      steps: [
+        M('collection_conversion_unbook', 'TCSP', t+'/'+s, 'Yellowcard', 'live'),
+        M('stable_deposit', 'TCSP', t, 'Obita Stablecoin Vault', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+      ]
+    });
+    if (has(CATS.NL14, s)) P.push({
+      n: '跨主体 Navro Collection → Stable',
+      tg: ['体内', '跨主体'],
+      steps: [
+        M('fiat_collection', 'MSO', s, 'Navro', 'plan'),
+        M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        X(),
+        M('fiat_deposit', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        M('conversion_internal', 'TCSP', 'USD/'+t, 'Obita Internal LP', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+      ]
+    });
+    if (s === 'USD') P.push({
+      n: '跨主体 USD Collection → Stable',
+      tg: ['体内', '跨主体'],
+      steps: [
+        M('fiat_collection', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        X(),
+        M('fiat_deposit', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        M('conversion_internal', 'TCSP', 'USD/'+t, 'Obita Internal LP', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+      ]
+    });
+    if (has(CATS.KSHER, s)) P.push({
+      n: '跨主体 Ksher Collection (bundled) → Stable',
+      tg: ['体内', '跨主体', 'bundled'],
+      steps: [
+        M('collection_conversion_book', 'MSO', 'USD/'+s, 'Ksher', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+        X(),
+        M('fiat_deposit', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+        M('conversion_internal', 'TCSP', 'USD/'+t, 'Obita Internal LP', 'live'),
+        M('stable_withdrawal', 'TCSP', t, 'Obita Stablecoin Vault', 'live')
+      ]
+    });
+  }
+  if (t === 'USD') {
+    if (has(CATS.NL14, s)) P.push({
+      n: 'MSO Navro Collection → USD',
+      tg: ['体内', '单主体 MSO', '可分离'],
+      steps: [
+        M('fiat_collection', 'MSO', s, 'Navro', 'plan'),
+        M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan')
+      ]
+    });
+    if (has(CATS.KSHER, s)) P.push({
+      n: 'MSO Ksher Collection (bundled) → USD',
+      tg: ['体内', '单主体 MSO', 'bundled'],
+      steps: [
+        M('collection_conversion_book', 'MSO', 'USD/'+s, 'Ksher', 'plan'),
+        M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan')
+      ]
+    });
+    if (has(CATS.VELAFI, s)) P.push({
+      n: 'Unbook Collection (Velafi) → USD',
+      tg: ['体外', '单主体 TCSP'],
+      steps: [
+        M('collection_conversion_unbook', 'TCSP', 'USDT/'+s, 'Velafi', 'live'),
+        M('stable_deposit', 'TCSP', 'USDT', 'Obita Stablecoin Vault', 'live'),
+        M('conversion_internal', 'TCSP', 'USDT/USD', 'Obita Internal LP', 'live'),
+        M('fiat_withdrawal', 'TCSP', 'USD', 'Obita Fiat Vault', 'live')
+      ]
+    });
+    if (has(CATS.YCARD, s)) P.push({
+      n: 'Unbook Collection (Yellowcard) → USD',
+      tg: ['体外', '单主体 TCSP'],
+      steps: [
+        M('collection_conversion_unbook', 'TCSP', 'USDT/'+s, 'Yellowcard', 'live'),
+        M('stable_deposit', 'TCSP', 'USDT', 'Obita Stablecoin Vault', 'live'),
+        M('conversion_internal', 'TCSP', 'USDT/USD', 'Obita Internal LP', 'live'),
+        M('fiat_withdrawal', 'TCSP', 'USD', 'Obita Fiat Vault', 'live')
+      ]
+    });
+  }
+}
+
+function convertPaths(s, t, P) {
+  if (isS(s) && t === 'USD') P.push({
+    n: 'Internal LP',
+    tg: ['体内', '单主体 TCSP'],
+    steps: [M('conversion_internal', 'TCSP', s+'/USD', 'Obita Internal LP', 'live')]
+  });
+  if (s === 'USD' && isS(t)) P.push({
+    n: 'Internal LP',
+    tg: ['体内', '单主体 TCSP'],
+    steps: [M('conversion_internal', 'TCSP', 'USD/'+t, 'Obita Internal LP', 'live')]
+  });
+  if (isS(s) && isS(t)) P.push({
+    n: 'Internal LP Cross',
+    tg: ['体内', '单主体 TCSP'],
+    steps: [M('conversion_internal', 'TCSP', s+'/'+t, 'Obita Internal LP', 'live')]
+  });
+  if (s === 'USD' && has(CATS.NL14, t)) P.push({
+    n: 'Navro Book FX',
+    tg: ['体内', '单主体 MSO'],
+    steps: [M('conversion_book', 'MSO', 'USD/'+t, 'Navro', 'plan')]
+  });
+  if (has(CATS.NL14, s) && t === 'USD') P.push({
+    n: 'Navro Book FX (反向)',
+    tg: ['体内', '单主体 MSO'],
+    steps: [M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan')]
+  });
+  if (isS(s) && has(CATS.NL14, t)) P.push({
+    n: '跨主体 '+s+' → USD → '+t,
+    tg: ['体内', '跨主体', '可分离'],
+    steps: [
+      M('conversion_internal', 'TCSP', s+'/USD', 'Obita Internal LP', 'live'),
+      M('fiat_withdrawal', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+      X(),
+      M('fiat_deposit', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+      M('conversion_book', 'MSO', 'USD/'+t, 'Navro', 'plan')
+    ]
+  });
+  if (has(CATS.NL14, s) && isS(t)) P.push({
+    n: '跨主体 '+s+' → USD → '+t,
+    tg: ['体内', '跨主体', '可分离'],
+    steps: [
+      M('conversion_book', 'MSO', s+'/USD', 'Navro', 'plan'),
+      M('fiat_withdrawal', 'MSO', 'USD', 'Obita Fiat Vault', 'plan'),
+      X(),
+      M('fiat_deposit', 'TCSP', 'USD', 'Obita Fiat Vault', 'live'),
+      M('conversion_internal', 'TCSP', 'USD/'+t, 'Obita Internal LP', 'live')
+    ]
+  });
+}
+
+function rankPaths(P) {
+  P.forEach(p => {
+    const st = p.steps.filter(x => !x.cross);
+    p.stepCount = st.length;
+    p.allLive = st.every(x => x.s === 'live');
+    p.cross = st.some(x => x.e === 'TCSP') && st.some(x => x.e === 'MSO');
+    p.unbook = p.tg.some(t => t === '体外');
+  });
+  // Simple multi-key sort: all-live first → single-entity → fewer steps
+  P.sort((a, b) => {
+    if (a.allLive !== b.allLive) return a.allLive ? -1 : 1;
+    if (a.cross !== b.cross) return a.cross ? 1 : -1;
+    return a.stepCount - b.stepCount;
+  });
+  return P;
+}
+
+/* ============================================================
+   RENDERERS
+============================================================ */
+
+const statusTxt = { live: '已上线', wip: '对接中', plan: '规划中', tbd: '待确认' };
+
+function statusPill(s, uncertain) {
+  return `<span class="st st-${s}${uncertain ? ' st-live-asterisk' : ''}">${statusTxt[s] || s}</span>`;
+}
+
+// ----- Section 1: Entities -----
+function escAttr(s) { return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+function fmtItem(it) {
+  const star = it.uncertain ? '<span class="ustar" title="假设已上线，实际对接中">*</span>' : '';
+  const inner = it.note
+    ? `<span class="cbi" title="${escAttr(it.note)}">${it.n}</span>`
+    : `<span class="cbi">${it.n}</span>`;
+  return inner + star;
+}
+
+// Emit ONE bullet per status bucket
+function renderBullets(items) {
+  const live = items.filter(x => x.s === 'live' || x.s === 'tbd');
+  const wip  = items.filter(x => x.s === 'wip');
+  const plan = items.filter(x => x.s === 'plan');
+  let h = '';
+  h += `<div class="cap-bullet">• 已有: ${live.length ? live.map(fmtItem).join(',') : 'n/a'}</div>`;
+  if (wip.length)  h += `<div class="cap-bullet">• 对接中: ${wip.map(fmtItem).join(',')}</div>`;
+  if (plan.length) h += `<div class="cap-bullet">• 规划中: ${plan.map(fmtItem).join(',')}</div>`;
+  return h;
+}
+
+function renderInfoCard(card) {
+  // card: { type: 'channel-in'|'channel-out'|'lp-out', title, items }
+  return `<div class="info-card ${card.type}">
+    <div class="info-title">${card.title}</div>
+    <div class="info-body">${renderBullets(card.items)}</div>
+  </div>`;
+}
+
+function renderCapGroup(g, i) {
+  return `<div class="cap-group open" data-idx="${i}">
+    <div class="cap-group-head" onclick="toggleCapGroup(this)">
+      <span class="chev">▶</span><span class="cat">${g.cat}</span>
+    </div>
+    <div class="cap-group-body">${renderBullets(g.items)}</div>
+  </div>`;
+}
+
+function renderEntities() {
+  const root = document.getElementById('entityGrid');
+  const T = ENTITIES.TCSP, M = ENTITIES.MSO;
+  let html = '';
+
+  // ---- TCSP box (grid row 1, col 1) ----
+  html += `<div class="entity tcsp">`;
+  html += `<div class="entity-head"><div class="name">${T.name}</div><div class="meta">${T.holder} · ${T.license} · ${T.moduleCount} 个模块</div></div>`;
+  html += `<div class="entity-blurb">${T.blurb}</div>`;
+  html += `<div class="cap-list">`;
+  T.groups.forEach((g,i) => { html += renderCapGroup(g, i); });
+  html += `</div>`;
+  html += `<div class="inner-entities tcsp-inner">
+    <div class="sub-card client">客户 A</div>
+    <div class="sub-card client">客户 B</div>
+    <div class="sub-card bvi">客户 C: LP (体内)<div class="line2">BVI 主体</div></div>
+  </div>`;
+  html += `</div>`;
+
+  // ---- MSO box (grid row 1-2, col 2) ----
+  html += `<div class="entity mso">`;
+  html += `<div class="entity-head"><div class="name">${M.name}</div><div class="meta">${M.holder} · ${M.license} · ${M.moduleCount} 个模块</div></div>`;
+  html += `<div class="entity-blurb">${M.blurb}</div>`;
+  html += `<div class="cap-list">`;
+  M.groups.forEach((g,i) => { html += renderCapGroup(g, i); });
+  html += `</div>`;
+  html += `<div class="mso-footer">`;
+  html += `<div class="inner-entities mso-inner">
+    <div class="sub-card client">客户 A</div>
+    <div class="sub-card client">客户 B</div>
+  </div>`;
+  if (M.innerChannel) {
+    html += `<div class="mso-bottom">${renderInfoCard(M.innerChannel)}</div>`;
+  }
+  html += `</div>`;  // close mso-footer
+  html += `</div>`;  // close entity.mso
+
+  // ---- TCSP outer row (grid row 2, col 1) ----
+  html += `<div class="outer-row tcsp-outer">`;
+  T.outerCards.forEach(c => { html += renderInfoCard(c); });
+  html += `</div>`;
+
+  // ---- MSO outer row (grid row 3, col 2) ----
+  html += `<div class="outer-row mso-outer">`;
+  M.outerCards.forEach(c => { html += renderInfoCard(c); });
+  html += `</div>`;
+
+  root.innerHTML = html;
+}
+
+function toggleCapGroup(head) {
+  head.parentElement.classList.toggle('open');
+}
+
+// ----- Section 2: Modules -----
+const FILTERS = {
+  entity: '',   // '', TCSP, MSO
+  asset:  '',   // '', stable, fiat, conversion
+  dir:    '',   // '', deposit, withdrawal, collection, payout, conversion
+  boundary: ''  // '', '' (plain direct = no boundary), book, unbook
+};
+
+const FILTER_DEFS = [
+  { key: 'entity', label: '主体', opts: [['','全部'],['TCSP','TCSP'],['MSO','MSO']], clsPrefix: 'e-' },
+  { key: 'asset',  label: '资产类型', opts: [['','全部'],['stable','稳定币'],['fiat','法币'],['conversion','换汇']] },
+  { key: 'dir',    label: '操作方向', opts: [['','全部'],['deposit','deposit'],['withdrawal','withdrawal'],['collection','collection'],['payout','payout'],['conversion','conversion']] },
+  { key: 'boundary', label: '账务边界', opts: [['','全部'],['book','体内'],['unbook','体外']], clsPrefix: 'b-' }
+];
+
+function renderFilterBar() {
+  const root = document.getElementById('filterBar');
+  let html = '';
+  FILTER_DEFS.forEach(def => {
+    html += `<div class="filter-group"><div class="filter-label">${def.label}</div><div class="chip-row">`;
+    def.opts.forEach(([v, label]) => {
+      const active = FILTERS[def.key] === v ? ' active' : '';
+      const cls = def.clsPrefix && v ? ` ${def.clsPrefix}${v.toLowerCase()}` : '';
+      html += `<button class="chip${active}${cls}" data-key="${def.key}" data-val="${v}">${label}</button>`;
+    });
+    html += `</div></div>`;
+  });
+  root.innerHTML = html;
+  root.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const k = btn.dataset.key, v = btn.dataset.val;
+      FILTERS[k] = FILTERS[k] === v ? '' : v;
+      renderFilterBar();
+      renderModules();
+    });
+  });
+}
+
+function matchesFilters(m) {
+  if (FILTERS.entity && m.e !== FILTERS.entity) return false;
+  if (FILTERS.asset && m.asset !== FILTERS.asset) return false;
+  if (FILTERS.dir && m.dir !== FILTERS.dir) return false;
+  if (FILTERS.boundary && m.boundary !== FILTERS.boundary) return false;
+  return true;
+}
+
+function renderModuleCard(m) {
+  const fullName = 'HK_' + m.e + '_' + m.id;
+  let h = `<div class="mcard e-${m.e}">`;
+  h += `<div class="mcard-top">`;
+  h += `<div class="mcard-row1">`;
+  h += `<span class="name">${fullName}</span>`;
+  if (m.uncertain) h += `<span class="uncertain-marker" title="场景/状态待 Tony 补充">⚠</span>`;
+  h += `<div class="tags">`;
+  m.tags.forEach(t => {
+    const labels = { book: '体内', unbook: '体外', bundled: 'bundled' };
+    h += `<span class="mtag ${t}">${labels[t] || t}</span>`;
+  });
+  h += `</div>`;
+  h += `</div>`; // close mcard-row1
+  h += `</div>`; // close mcard-top
+  h += `<div class="mcard-routes">`;
+  m.routes.forEach(r => {
+    h += `<div class="route-row">`;
+    h += `<div class="route-provider">${r.p}</div>`;
+    h += `<div class="route-pairs">${renderPairs(r.pairs, { full: r.full })}${r.note ? `<span class="faint">· ${r.note}</span>` : ''}</div>`;
+    h += `<div>${statusPill(r.s, r.uncertain)}</div>`;
+    h += `</div>`;
+  });
+  h += `</div></div>`; // close mcard-routes and mcard
+  return h;
+}
+
+function renderModules() {
+  const root = document.getElementById('moduleGrid');
+  const filtered = MODULES.filter(matchesFilters);
+  document.getElementById('moduleCount').textContent =
+    `显示 ${filtered.length} / ${MODULES.length} 个模块`;
+
+  const tcspMods = filtered.filter(m => m.e === 'TCSP');
+  const msoMods  = filtered.filter(m => m.e === 'MSO');
+  const tcspTotal = MODULES.filter(m => m.e === 'TCSP').length;
+  const msoTotal  = MODULES.filter(m => m.e === 'MSO').length;
+
+  const col = (mods, entity, total, label) => {
+    let h = `<div class="entity-col">`;
+    h += `<div class="col-header ${entity.toLowerCase()}"><span>${label}</span><span class="count">${mods.length} / ${total} 模块</span></div>`;
+    if (mods.length) mods.forEach(m => { h += renderModuleCard(m); });
+    else h += `<div class="col-empty">筛选后无符合模块</div>`;
+    h += `</div>`;
+    return h;
+  };
+
+  root.innerHTML = col(tcspMods, 'TCSP', tcspTotal, 'HK_TCSP') + col(msoMods, 'MSO', msoTotal, 'HK_MSO');
+
+  // Copy-all for popover
+  root.querySelectorAll('.pp-copy').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const text = btn.dataset.text || '';
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = '已复制';
+        btn.classList.add('copied');
+      } catch (_err) {
+        // Fallback: select text so user can Cmd+C
+        const sel = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(btn.parentElement.querySelector('.pp-text'));
+        sel.removeAllRanges(); sel.addRange(range);
+        btn.textContent = '已选中 · ⌘C';
+      }
+      setTimeout(() => { btn.textContent = '复制全部'; btn.classList.remove('copied'); }, 1800);
+    });
+  });
+}
+
+function renderPairs(pairs, opts) {
+  opts = opts || {};
+  if (opts.full || pairs.length <= 7) return pairs.join(', ');
+  const shown = pairs.slice(0, 7).join(', ');
+  const full = pairs.join(', ');
+  const extra = pairs.length - 7;
+  return shown + ', <span class="pairs-more" tabindex="0">+' + extra + ' 个' +
+    '<span class="pairs-popover">' +
+      '<div class="pp-count">全部 ' + pairs.length + ' 对：</div>' +
+      '<div class="pp-text">' + full + '</div>' +
+      '<button class="pp-copy" type="button" data-text="' + escAttr(full) + '">复制全部</button>' +
+    '</span></span>';
+}
+
+// ----- Section 3: Orchestration -----
+function renderPresets() {
+  const root = document.getElementById('presetBar');
+  PRESETS.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.textContent = p.n;
+    btn.title = p.tag;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadPreset(p);
+    });
+    root.appendChild(btn);
+  });
+}
+
+function loadPreset(p) {
+  document.getElementById('selSvc').value = p.svc;
+  buildSrcTgtOptions(p.svc, p.src, p.tgt);
+  renderPathsForQuery();
+}
+
+function initSvcSelect() {
+  const se = document.getElementById('selSvc');
+  se.innerHTML = `<option value="">请选择</option>
+    <option value="payout">Payout（付款给第三方）</option>
+    <option value="collection">Collection（从第三方收款）</option>
+    <option value="conversion">Conversion（换汇·留账内）</option>
+    <option value="onramp">On-ramp（入金 法币 → 稳定币）</option>
+    <option value="offramp">Off-ramp（出金 稳定币 → 法币）</option>`;
+  se.addEventListener('change', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    buildSrcTgtOptions(se.value);
+    renderPathsForQuery();
+  });
+}
+
+function og(label, arr) {
+  let h = `<optgroup label="${label}">`;
+  arr.forEach(c => { h += `<option value="${c}">${c}</option>`; });
+  return h + '</optgroup>';
+}
+
+function nb41Extra() {
+  return CATS.NB41.filter(c => !has(CATS.VELAFI, c) && !has(CATS.YCARD, c) && !has(CATS.NL14, c));
+}
+
+function buildSrcTgtOptions(svc, presetSrc, presetTgt) {
+  const se = document.getElementById('selSrc'), te = document.getElementById('selTgt');
+  se.disabled = te.disabled = !svc;
+  if (!svc) {
+    se.innerHTML = te.innerHTML = '<option value="">请先选服务类型</option>';
+    return;
+  }
+  let srcHtml = '<option value="">请选择</option>', tgtHtml = '<option value="">请选择</option>';
+  if (svc === 'payout') {
+    srcHtml += og('稳定币', ['USDT', 'USDC']) + og('法币', ['USD']);
+    tgtHtml += og('法币基础', ['USD']) + og('Navro 本地账户', CATS.NL14) + og('LATAM · Velafi', CATS.VELAFI) + og('Africa · Yellowcard', CATS.YCARD) + og('其他 B2B · Navro', nb41Extra());
+  } else if (svc === 'collection') {
+    srcHtml += og('法币基础', ['USD']) + og('Navro 本地账户', CATS.NL14) + og('LATAM · Velafi', CATS.VELAFI) + og('Africa · Yellowcard', CATS.YCARD) + og('ASEAN · Ksher', CATS.KSHER);
+    tgtHtml += og('稳定币', ['USDT', 'USDC']) + og('法币', ['USD']);
+  } else if (svc === 'conversion') {
+    const opts = og('稳定币', ['USDT', 'USDC']) + og('法币', ['USD']) + og('Navro 本地账户', CATS.NL14);
+    srcHtml += opts; tgtHtml += opts;
+  } else if (svc === 'onramp') {
+    srcHtml += og('法币', ['USD']);
+    tgtHtml += og('稳定币', ['USDT', 'USDC']);
+  } else if (svc === 'offramp') {
+    srcHtml += og('稳定币', ['USDT', 'USDC']);
+    tgtHtml += og('法币', ['USD']);
+  }
+  se.innerHTML = srcHtml; te.innerHTML = tgtHtml;
+  if (presetSrc) se.value = presetSrc;
+  if (presetTgt) te.value = presetTgt;
+}
+
+function initSrcTgtListeners() {
+  document.getElementById('selSrc').addEventListener('change', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    renderPathsForQuery();
+  });
+  document.getElementById('selTgt').addEventListener('change', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    renderPathsForQuery();
+  });
+}
+
+function renderPathsForQuery() {
+  const svc = document.getElementById('selSvc').value;
+  const src = document.getElementById('selSrc').value;
+  const tgt = document.getElementById('selTgt').value;
+  const root = document.getElementById('orchResult');
+  if (!svc) { root.innerHTML = `<div class="no-paths">选择服务类型、源资产、目标资产以查看路径</div>`; return; }
+  if (!src || !tgt) { root.innerHTML = `<div class="no-paths">请继续选择${!src ? '源资产' : '目标资产'}</div>`; return; }
+  if (src === tgt) { root.innerHTML = `<div class="no-paths">源资产与目标资产相同</div>`; return; }
+  const paths = findPaths(svc, src, tgt);
+  if (!paths.length) {
+    root.innerHTML = `<div class="no-paths">${svc} · ${src} → ${tgt} 暂无可行路径<br><span class="faint" style="font-size:12px;">（路由引擎暂未覆盖此组合；参见交接文档 §4 待迭代项）</span></div>`;
+    return;
+  }
+  let html = `<div class="path-summary-line">找到 <b>${paths.length}</b> 条可行路径 · <b>${svc.toUpperCase()}</b> · ${src} → ${tgt} · 按推荐级排序</div>`;
+  // Comparison table
+  if (paths.length > 1) {
+    html += `<div class="compare-table"><table><thead><tr><th>#</th><th>路径</th><th>步数</th><th>标签</th><th>状态</th></tr></thead><tbody>`;
+    paths.forEach((p, i) => {
+      html += `<tr data-idx="${i}"><td class="c-rank">${i+1}</td><td class="c-name">${p.n}</td><td>${p.stepCount}</td><td><div class="c-tags">${p.tg.map(t => `<span class="${pTagClass(t)}">${t}</span>`).join('')}</div></td><td>${p.allLive ? '<span class="ptag ptag-live">全部已上线</span>' : '<span class="ptag ptag-warn">部分未上线</span>'}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  // Path cards
+  paths.forEach((p, i) => {
+    html += renderPathCard(p, i);
+  });
+  root.innerHTML = html;
+
+  // Click on compare row → highlight / scroll
+  root.querySelectorAll('.compare-table tbody tr').forEach(tr => {
+    tr.addEventListener('click', () => {
+      const idx = +tr.dataset.idx;
+      root.querySelectorAll('.path-card').forEach(c => c.classList.remove('hl'));
+      root.querySelectorAll('.compare-table tbody tr').forEach(c => c.classList.remove('hl'));
+      const target = root.querySelectorAll('.path-card')[idx];
+      if (target) {
+        target.classList.add('hl');
+        tr.classList.add('hl');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+}
+
+// 账务体系色优先：TCSP 蓝 / MSO 紫 / 体外 橙虚线 / 跨主体 中性 / bundled 粉 / 可分离 黄
+function pTagClass(t) {
+  let cls = 'ptag';
+  if (t.indexOf('体外') >= 0) return cls + ' ptag-unbook';
+  if (t.indexOf('TCSP') >= 0) return cls + ' ptag-tcsp';
+  if (t.indexOf('MSO') >= 0)  return cls + ' ptag-mso';
+  if (t.indexOf('跨主体') >= 0) return cls + ' ptag-cross';
+  if (t === 'bundled')       return cls + ' ptag-bundled';
+  if (t === '可分离')         return cls + ' ptag-sep';
+  if (t.indexOf('体内') >= 0) return cls + ' ptag-book';
+  return cls;
+}
+
+function renderPathCard(p, i) {
+  // Border-left: cross → 橙色；单主体 TCSP → 蓝；单主体 MSO → 紫
+  const cls = p.cross ? 'cross' : (p.steps[0] && p.steps[0].e === 'MSO' ? 'single-mso' : '');
+  let h = `<div class="path-card ${cls}" data-idx="${i}">`;
+  h += `<div class="path-header">`;
+  h += `<span class="path-rank">#${i+1}</span>`;
+  h += `<span class="path-name">${p.n}</span>`;
+  h += `<span class="path-tags">`;
+  h += `<span class="ptag ptag-steps">${p.stepCount} 步</span>`;
+  p.tg.forEach(t => { h += `<span class="${pTagClass(t)}">${t}</span>`; });
+  h += p.allLive ? `<span class="ptag ptag-live">全部已上线</span>` : `<span class="ptag ptag-warn">部分未上线</span>`;
+  h += `</span></div>`;
+  h += `<div class="path-pipe">`;
+  p.steps.forEach((s, j) => {
+    if (s.cross) {
+      h += `<div class="path-cross"><div class="path-cross-arrow">⟶</div><div class="path-cross-label">跨主体</div></div>`;
+      return;
+    }
+    if (j > 0 && !p.steps[j-1].cross) h += `<div class="path-arrow">→</div>`;
+    const mc = modCls(s);
+    h += `<div class="path-step">`;
+    h += `<div class="path-entity ${s.e}">${s.e}</div>`;
+    h += `<div class="path-mod ${mc}">${s.m}</div>`;
+    h += `<div class="path-detail">${s.d}</div>`;
+    h += `<div class="path-provider">${s.p}</div>`;
+    h += `<div class="path-status">${statusPill(s.s, s.u)}</div>`;
+    h += `</div>`;
+  });
+  h += `</div></div>`;
+  return h;
+}
+
+// Color rule: 账务体系决定颜色 — TCSP 蓝 / MSO 紫 / 体外(unbook) 橙虚线
+function modCls(s) {
+  if (s.m.indexOf('unbook') >= 0) return 'mod-unbook';
+  return s.e === 'TCSP' ? 'mod-TCSP' : 'mod-MSO';
+}
+
+/* ============================================================
+   THEME
+============================================================ */
+function initTheme() {
+  let saved = 'light';
+  try { saved = localStorage.getItem('obita-theme') || 'light'; } catch (e) {}
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    if (cur === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    try { localStorage.setItem('obita-theme', cur); } catch (e) {}
+  });
+}
+
+/* ============================================================
+   AUTH
+============================================================ */
+function unlockPage() {
+  document.body.classList.remove('auth-locked');
+  document.body.classList.add('auth-unlocked');
+  try { sessionStorage.setItem('obita-auth-ok', '1'); } catch (e) {}
+}
+
+function initAuthGate() {
+  let alreadyOk = false;
+  try { alreadyOk = sessionStorage.getItem('obita-auth-ok') === '1'; } catch (e) {}
+  if (alreadyOk) {
+    unlockPage();
+    return true;
+  }
+
+  const form = document.getElementById('authForm');
+  const userInput = document.getElementById('authUser');
+  const passInput = document.getElementById('authPass');
+  const errorEl = document.getElementById('authError');
+  if (!form || !userInput || !passInput || !errorEl) return false;
+
+  userInput.focus();
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const ok = userInput.value.trim() === 'tony' && passInput.value === 'tototony';
+    if (!ok) {
+      errorEl.textContent = '用户名或密码错误';
+      passInput.value = '';
+      passInput.focus();
+      return;
+    }
+    errorEl.textContent = '';
+    unlockPage();
+    init();
+  });
+  return false;
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+function init() {
+  initTheme();
+  renderEntities();
+  renderFilterBar();
+  renderModules();
+  document.getElementById('filterReset').addEventListener('click', () => {
+    Object.keys(FILTERS).forEach(k => FILTERS[k] = '');
+    renderFilterBar();
+    renderModules();
+  });
+  renderPresets();
+  initSvcSelect();
+  initSrcTgtListeners();
+  renderPathsForQuery();
+}
+
+function boot() {
+  const canEnter = initAuthGate();
+  if (canEnter) init();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
 </script>
-<!-- obita-auth-snippet:end -->
 </body>
 </html>
