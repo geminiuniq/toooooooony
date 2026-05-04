@@ -1,0 +1,40 @@
+Obita HTML Publisher Skill 使用说明
+
+一、目标（给使用者）
+使用者只需要做 1 件事：上传最新 HTML 文件。
+用户名/密码登录门禁会自动处理，不需要手工设置。
+
+二、自动完成的内容（Skill 内部）
+1) 自动选择当前目录中最新修改的 .html 文件
+2) 自动覆盖到 index.html
+3) 如果页面没有登录门禁，自动注入：
+   - 用户名: tony
+   - 密码: tototony
+4) 自动提交并推送处理后的 index.html 到仓库
+
+目标仓库:
+https://github.com/geminiuniq/toooooooony
+
+Lark 文件夹来源:
+https://obitaxyz.sg.larksuite.com/drive/folder/VnNVfkStNlqdS7dOlXNlnRaRgEb
+
+三、推荐使用方式
+上传 HTML 后，在仓库根目录执行一条命令：
+
+bash skills/obita-html-publisher/scripts/publish_latest_html.sh
+
+四、自然语言唤起方式
+示例：
+- 我已经上传了最新 html，请用 obita-html-publisher 发布
+- 上传好了，帮我自动处理登录并发布到 GitHub
+
+五、说明
+1) 发布的是处理后的页面文件 index.html，不是 Skill 文件。
+2) 默认从“本地已有文件”中取最新 html；不自动登录 Lark 下载。
+3) 登录门禁为前端轻量访问控制，不是后端强鉴权。
+
+六、Skill 文件位置
+- skills/obita-html-publisher/SKILL.md
+- skills/obita-html-publisher/scripts/sync_latest_html.sh
+- skills/obita-html-publisher/scripts/publish_latest_html.sh
+- skills/obita-html-publisher/agents/openai.yaml
