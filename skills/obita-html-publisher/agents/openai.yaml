@@ -1,0 +1,3 @@
+display_name: Obita HTML Publisher
+short_description: 同步最新 HTML、校验登录门禁并发布
+default_prompt: 从最新 html 更新 index.html，确保 tony/tototony 登录门禁存在，然后提交并推送到 GitHub。
