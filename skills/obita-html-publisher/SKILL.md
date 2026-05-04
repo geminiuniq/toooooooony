@@ -19,8 +19,8 @@ Lark 文件夹：
    `bash skills/obita-html-publisher/scripts/sync_latest_html.sh`
 2. 脚本会：
    - 选择当前目录下最新修改的 `.html` 文件
-   - 确保页面包含登录门禁（用户名 `tony`，密码 `tototony`）
    - 同步覆盖 `index.html`
+   - 若页面缺失登录门禁，则自动注入用户名/密码登录（`tony` / `tototony`）
 3. 检查差异：
    `git status` 和 `git diff -- index.html`
 4. 提交并发布：
@@ -29,6 +29,6 @@ Lark 文件夹：
    - `git push`
 
 ## 重要说明
-- Lark 文件夹的“直接下载最新 HTML”通常依赖登录态/Cookie；脚本默认从**本地已拉取文件**中选“最新 HTML”。
+- Lark 文件夹的“直接下载最新 HTML”通常依赖登录态/Cookie；脚本默认从**本地已拉取文件**中选“最新 HTML”并发布处理后的 `index.html`。
 - 若需要真正从 Lark 自动下载，先在本机配置可用 Cookie，再扩展脚本下载步骤。
 - 这个登录是前端门禁，不是后端强鉴权；用于轻量访问控制。
